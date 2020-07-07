@@ -2,4 +2,4 @@
 Currently in developing stage...
 
 ## Goal
-Compare two encodings, which are CGP _Cartesian Genetic Programming_ and ANF _Algebraic Normal Form_.
+Comparison between two encodings, which are CGP _Cartesian Genetic Programming_ and ANF _Algebraic Normal Form_.
