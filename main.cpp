@@ -161,11 +161,11 @@ private:
         }
     }
 
-    std::vector<std::string> split(const std::string &str) {
+    std::vector<std::string> split(const std::string &str, const char delimiter) {
         std::vector<std::string> list;
         std::string tmp;
         for (auto &c : str) {
-            if (c == ',') {
+            if (c == delimiter) {
                 boost::algorithm::to_lower(tmp);
                 list.push_back(tmp);
                 tmp.clear();
@@ -179,7 +179,7 @@ private:
 
     void parse_function_list(const std::string &list) {
         allowed_functions.clear();
-        auto fun_list = split(list);
+        auto fun_list = split(list, ',');
 
         for (auto &x : fun_list) {
             function_append(x);
@@ -212,6 +212,7 @@ int main(int argc, char *argv[]) {
         //ReferenceBits reference_bits = parse_file(path);
         ReferenceBits reference_bits(path);
         Parameters params(argc, argv);
+        std::cout << static_cast<int>(params.allowed_functions[0]) << std::endl;
     } catch (const MyException &err) {
         std::cerr << "ERROR: " << err.what() << std::endl;
         return 1;
