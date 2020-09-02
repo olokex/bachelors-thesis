@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/algorithm/string.hpp>
 #include <fstream>
@@ -132,31 +133,62 @@ public:
     }
 
 private:
+    const std::map<std::string, Function> function_list = {
+        {"in", Function::In},
+        {"not", Function::Not},
+        {"and", Function::And},
+        {"or", Function::Or},
+        {"xor", Function::Xor},
+        {"nand", Function::Nand},
+        {"nor", Function::Nor},
+        {"xnor", Function::Xnor}
+    };
+
     void function_append(const std::string &fun) {
-        if (fun == "in") allowed_functions.push_back(Function::In);
-        else if (fun == "not") allowed_functions.push_back(Function::Not);
-        else if (fun == "and") allowed_functions.push_back(Function::And);
-        else if (fun == "or") allowed_functions.push_back(Function::Or);
-        else if (fun == "xor") allowed_functions.push_back(Function::Xor);
-        else if (fun == "nand") allowed_functions.push_back(Function::Nand);
-        else if (fun == "nor") allowed_functions.push_back(Function::Nor);
-        else if (fun == "xnor") allowed_functions.push_back(Function::Xnor);
-        else { throw MyException("invalid function"); }
+        try {
+            allowed_functions.push_back(function_list.at(fun));
+        } catch (std::out_of_range) {
+            throw MyException("invalid function " + fun + ", allowed: in, not, and, or, xor, nand, nor, xnor");
+        }
+    }
+
+    void check_duplicate() {
+        for (auto &fun : allowed_functions) {
+            int occur = std::count(allowed_functions.begin(), allowed_functions.end(), fun);
+            if (occur > 1) {
+                throw MyException("function in list is duplicated");
+            }
+        }
+    }
+
+    std::vector<std::string> split(const std::string &str) {
+        std::vector<std::string> list;
+        std::string tmp;
+        for (auto &c : str) {
+            if (c == ',') {
+                boost::algorithm::to_lower(tmp);
+                list.push_back(tmp);
+                tmp.clear();
+            } else {
+                tmp += c;
+            }
+        }
+        list.push_back(tmp);
+        return list;
     }
 
     void parse_function_list(const std::string &list) {
         allowed_functions.clear();
-        std::string tmp;
-        for (int i = 0; i < list.size(); i++) {
-            if (list[i] == ',') {
-                boost::algorithm::to_lower(tmp);
-                function_append(tmp);
-                tmp.clear();
-            } else {
-                tmp += list[i];
-            }
+        auto fun_list = split(list);
+
+        for (auto &x : fun_list) {
+            function_append(x);
         }
-        function_append(tmp);
+
+        check_duplicate();
+        if (allowed_functions.size() <= 1) {
+            throw MyException("there is too little functions to work with");
+        }
     }
 
     int parse_number(const std::string &value, const int lowest = 1) {
@@ -165,9 +197,9 @@ private:
             if (num < lowest) throw std::range_error("");
             return num;
         } catch (std::invalid_argument) {
-            throw MyException("not a number, bad switch value");
+            throw MyException("not a number, bad switch value " + value);
         } catch (std::range_error) {
-            throw MyException("number is in wrong range");
+            throw MyException("number is in wrong range " + value);
         }
     }
 };
