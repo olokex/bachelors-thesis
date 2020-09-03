@@ -166,7 +166,6 @@ private:
         std::string tmp;
         for (auto &c : str) {
             if (c == delimiter) {
-                boost::algorithm::to_lower(tmp);
                 list.push_back(tmp);
                 tmp.clear();
             } else {
@@ -181,8 +180,9 @@ private:
         allowed_functions.clear();
         auto fun_list = split(list, ',');
 
-        for (auto &x : fun_list) {
-            function_append(x);
+        for (auto &fun : fun_list) {
+            boost::algorithm::to_lower(fun);
+            function_append(fun);
         }
 
         check_duplicate();
