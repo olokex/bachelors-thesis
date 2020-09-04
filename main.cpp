@@ -113,6 +113,7 @@ public:
 
     Parameters() {};
     Parameters(int argc, char *argv[]) {
+
         // TODO HELP?
         if (argc % 2 != 1) {
             throw MyException("invalid switch option");
@@ -161,24 +162,19 @@ private:
         }
     }
 
-    std::vector<std::string> split(const std::string &str, const char delimiter) {
+    std::vector<std::string> split(const std::string &functions, const char delimiter=',') {
+        std::stringstream ss(functions);
+        std::string token;
         std::vector<std::string> list;
-        std::string tmp;
-        for (auto &c : str) {
-            if (c == delimiter) {
-                list.push_back(tmp);
-                tmp.clear();
-            } else {
-                tmp += c;
-            }
+        while(std::getline(ss, token, delimiter)) {
+            list.push_back(token);
         }
-        list.push_back(tmp);
         return list;
     }
 
     void parse_function_list(const std::string &list) {
         allowed_functions.clear();
-        auto fun_list = split(list, ',');
+        auto fun_list = split(list);
 
         for (auto &fun : fun_list) {
             boost::algorithm::to_lower(fun);
@@ -212,7 +208,6 @@ int main(int argc, char *argv[]) {
         //ReferenceBits reference_bits = parse_file(path);
         ReferenceBits reference_bits(path);
         Parameters params(argc, argv);
-        std::cout << static_cast<int>(params.allowed_functions[0]) << std::endl;
     } catch (const MyException &err) {
         std::cerr << "ERROR: " << err.what() << std::endl;
         return 1;
