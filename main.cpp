@@ -108,28 +108,63 @@ public:
     int generations = 5'000'000;
     int row = 1;
     int column = 80;
-    int mutate_components = 5;
+    int mutate = 5;
+    int level_back = 0;
     int seed = time(nullptr);
+    std::string path;
+    bool print_fitness = false;
 
     Parameters() {};
-    Parameters(int argc, char *argv[]) {
-
-        // TODO HELP?
+    Parameters(const int argc, const char * const argv[]) {
         if (argc % 2 != 1) {
-            throw MyException("invalid switch option");
+            throw MyException("invalid parameters count");
         }
-        
         for (int i = 1; i < argc; i += 2) {
             std::string opt(argv[i]);
             std::string val(argv[i + 1]);
-            if (opt == "lambda") lambda = parse_number(val);
-            else if (opt == "generations") generations = parse_number(val);
-            else if (opt == "row") row = parse_number(val);
-            else if (opt == "column") column = parse_number(val);
-            else if (opt == "mutate") mutate_components = parse_number(val, 0);
-            else if (opt == "seed") seed = parse_number(val, 0);
-            else if (opt == "function") parse_function_list(val);
-            else { throw MyException("wrong switch option"); }
+            if (opt == "lambda") {
+                if (!parse_int(lambda, val) || lambda < 1) {
+                    throw MyException("Invalid value for lambda, expected number >= 1");
+                }
+            } else if (opt == "generations") {
+                if (!parse_int(generations, val) || generations < 1) {
+                    throw MyException("Invalid value for generations, expected number >= 1");
+                }
+            } else if (opt == "row") {
+                if (!parse_int(row, val) || row < 1) {
+                    throw MyException("Invalid value for row, expected number >= 1");
+                }
+            } else if (opt == "column") {
+                if (!parse_int(column, val) || column < 1) {
+                    throw MyException("Invalid value for column, expected number >= 1");
+                }
+            } else if (opt == "mutate") {
+                if (!parse_int(mutate, val) || mutate < 0) {
+                    throw MyException("Invalid value for , expected number >= 0");
+                }
+            } else if (opt == "lback") {
+                if (!parse_int(level_back, val)) {
+                    throw MyException("level back invalid number TODO");
+                }
+                /*if (parse_int(level_back, val) || level_back < 1) {
+                    throw MyException("Invalid value for , expected number >= 1");
+                }*/
+            } else if (opt == "seed") {
+                if (!parse_int(seed, val) || seed < 0) { // TODO
+                    throw MyException("Invalid value for seed, expected number >= 0");
+                }
+            } else if (opt == "path") {
+                path = val; // validity provides reference bits object
+            } else if (opt == "printfitness") {
+                if (val != "true" || val != "false") {
+                    throw MyException("Invalid value for printfitness, expected true or false");
+                }
+                print_fitness = (val == "true");
+            } else if (opt == "functions") {
+                parse_function_list(val);
+            } else {
+                throw MyException("Invalid switch option");
+            }
         }
     }
 
@@ -187,27 +222,32 @@ private:
         }
     }
 
-    int parse_number(const std::string &value, const int lowest = 1) {
+    bool parse_int(int &value, const std::string &str) {
         try {
-            int num = std::stoi(value);
-            if (num < lowest) throw std::range_error("");
-            return num;
+            value = std::stoi(str);
+            return true;
         } catch (std::invalid_argument) {
-            throw MyException("not a number, bad switch value " + value);
-        } catch (std::range_error) {
-            throw MyException("number is in wrong range " + value);
+            return false;
         }
     }
 };
 
+void print_help() {
+    std::cout << "help me" << std::endl;
+}
 
 int main(int argc, char *argv[]) {
     try {
         //std::string path("/home/olok/cgp_64bit/data/multiplier2x2.txt");
         std::string path("/home/olok/cgp_64bit/data/parity5.txt");
         //ReferenceBits reference_bits = parse_file(path);
-        ReferenceBits reference_bits(path);
+        if (argc == 2 && std::string(argv[1]) == "-h") {
+            print_help();
+            return 0;
+        }
+        //ReferenceBits reference_bits(path);
         Parameters params(argc, argv);
+        std::cout << params.lambda << std::endl;
     } catch (const MyException &err) {
         std::cerr << "ERROR: " << err.what() << std::endl;
         return 1;
