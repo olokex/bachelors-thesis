@@ -2,6 +2,7 @@
 #include <map>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include <fstream>
 #include <ctime>
 #include <string>
@@ -110,7 +111,7 @@ public:
     int column = 80;
     int mutate = 5;
     int level_back = 0;
-    int seed = time(nullptr);
+    unsigned int seed = time(nullptr);
     std::string path;
     bool print_fitness = false;
 
@@ -119,6 +120,7 @@ public:
         if (argc % 2 != 1) {
             throw MyException("invalid parameters count");
         }
+        bool lback_all = false;
         for (int i = 1; i < argc; i += 2) {
             std::string opt(argv[i]);
             std::string val(argv[i + 1]);
@@ -140,23 +142,22 @@ public:
                 }
             } else if (opt == "mutate") {
                 if (!parse_int(mutate, val) || mutate < 0) {
-                    throw MyException("Invalid value for , expected number >= 0");
+                    throw MyException("Invalid value for mutate, expected number >= 0");
                 }
             } else if (opt == "lback") {
-                if (!parse_int(level_back, val)) {
-                    throw MyException("level back invalid number TODO");
+                if (val == "all") {
+                    lback_all = true;
+                } else if (!parse_int(level_back, val) || level_back < 1) {
+                    throw MyException("Invalid value for level-back, expected number >= 1");
                 }
-                /*if (parse_int(level_back, val) || level_back < 1) {
-                    throw MyException("Invalid value for , expected number >= 1");
-                }*/
             } else if (opt == "seed") {
-                if (!parse_int(seed, val) || seed < 0) { // TODO
-                    throw MyException("Invalid value for seed, expected number >= 0");
+                if (!parse_unsigned_int(seed, val)) {
+                    throw MyException("Invalid value for seed, expected positive number");
                 }
             } else if (opt == "path") {
                 path = val; // validity provides reference bits object
             } else if (opt == "printfitness") {
-                if (val != "true" || val != "false") {
+                if (val != "true" && val != "false") {
                     throw MyException("Invalid value for printfitness, expected true or false");
                 }
                 print_fitness = (val == "true");
@@ -165,6 +166,12 @@ public:
             } else {
                 throw MyException("Invalid switch option");
             }
+        }
+
+        if (lback_all) {
+            level_back = column;
+        } else if (!(level_back <= column)) {
+            throw MyException("Invalid level-back value, value has to be <= " + std::to_string(column));
         }
     }
 
@@ -224,15 +231,28 @@ private:
 
     bool parse_int(int &value, const std::string &str) {
         try {
-            value = std::stoi(str);
+            value = boost::lexical_cast<int>(str);
             return true;
-        } catch (std::invalid_argument) {
+        } catch (boost::bad_lexical_cast) {
+            return false;
+        }
+    }
+
+    bool parse_unsigned_int(unsigned int &value, const std::string &str) {
+        try {
+            value = boost::lexical_cast<unsigned int>(str);
+            if (str.find('-') != std::string::npos) {
+                throw boost::bad_lexical_cast();
+            }
+            return true;
+        } catch (boost::bad_lexical_cast) {
             return false;
         }
     }
 };
 
 void print_help() {
+    // TODO
     std::cout << "help me" << std::endl;
 }
 
@@ -247,7 +267,8 @@ int main(int argc, char *argv[]) {
         }
         //ReferenceBits reference_bits(path);
         Parameters params(argc, argv);
-        std::cout << params.lambda << std::endl;
+        std::cout << params.column << std::endl;
+        std::cout << params.print_fitness << std::endl;
     } catch (const MyException &err) {
         std::cerr << "ERROR: " << err.what() << std::endl;
         return 1;
