@@ -12,7 +12,7 @@ ReferenceBits::ReferenceBits(const std::string &path) {
     fp.open(path);
 
     if (!fp.is_open()) {
-        throw MyException("opening file `" + path + "` failed");
+        throw CGPException("opening file `" + path + "` failed");
     }
 
     std::vector<std::string> file_clear = remove_unnecessary(fp);
@@ -51,9 +51,9 @@ std::vector<std::string> ReferenceBits::remove_unnecessary(std::ifstream &fp) {
 }
 
 void ReferenceBits::input_append(const std::string bits) {
-    input.push_back(boost::dynamic_bitset<>(bits));
+    input.push_back(Bitset(bits));
 }
 
 void  ReferenceBits::output_append(const std::string bits) {
-    output.push_back(boost::dynamic_bitset<>(bits));
+    output.push_back(Bitset(bits));
 }

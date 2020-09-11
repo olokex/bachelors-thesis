@@ -5,9 +5,9 @@
 #include <stdexcept>
 
 
-class MyException : public std::runtime_error {
+class CGPException : public std::runtime_error {
 public:
-    MyException(const std::string &msg = "") : std::runtime_error(msg) {}
+    CGPException(const std::string &msg = "") : std::runtime_error(msg) {}
 };
 
 #endif /* MY_EXCEPTION_H */

@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include "function.hpp"
+#include "utils.hpp"
 
 class Parameters {
 public:
@@ -17,11 +18,11 @@ public:
         Function::Nor,
         Function::Xnor
     };
-    int lambda = 5;
+    int lambda = 4;
     int generations = 5'000'000;
     int row = 1;
     int column = 80;
-    int mutate = 5;
+    int mutation_rate = 5;
     int level_back = 0;
     unsigned int seed = time(nullptr);
     std::string path;
@@ -42,7 +43,6 @@ private:
         {"xnor", Function::Xnor}
     };
 
-    void check_duplicate();
     void function_append(const std::string &fun);
     void parse_function_list(const std::string &list);
 };

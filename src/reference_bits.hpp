@@ -4,10 +4,12 @@
 #include <vector>
 #include <string>
 
+using Bitset = boost::dynamic_bitset<>;
+
 class ReferenceBits {
 public:
-    std::vector<boost::dynamic_bitset<>> input;
-    std::vector<boost::dynamic_bitset<>> output;
+    std::vector<Bitset> input;
+    std::vector<Bitset> output;
     ReferenceBits(const std::string &path);
 
 private:
