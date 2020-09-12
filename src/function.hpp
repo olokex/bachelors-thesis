@@ -10,7 +10,6 @@ enum class Function {
     Nand,
     Nor,
     Xnor,
-    NumberOfFunctions
 };
 
 #endif /* FUNCTION_H */
