@@ -27,6 +27,7 @@ public:
     unsigned int seed = time(nullptr);
     std::string path;
     bool print_fitness = false;
+    unsigned int print_count = 100'000;
 
     Parameters();
     Parameters(const int argc, const char * const argv[]);

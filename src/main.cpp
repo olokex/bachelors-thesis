@@ -19,8 +19,8 @@
 
 class Cell {
 public:
-    int input1; //unsigned short int input1;
-    int input2; //unsigned short int input2;
+    int input1;
+    int input2;
     Function function;
     Bitset output;
 };
@@ -49,31 +49,6 @@ public:
                 col < param.level_back ? 0 : start_cells_size - param.level_back * param.row,
                 start_cells_size);
         };
-        #if 0
-        auto random_input = [&](int start_cells_size, int col) {
-            int start_bound;
-            int end_bound;
-            auto moved_past_inputs = [&]() {
-                return col > param.level_back;
-            };
-            auto calc_with_inputs = [&]() {
-                start_bound = 0;
-                end_bound = reference_bits.input.size() + (param.level_back - 1) * param.row;
-                if (end_bound > start_cells_size)
-                    end_bound = start_cells_size;
-            };
-            auto calc_without_inputs = [&]() {
-                end_bound = start_cells_size;
-                start_bound = end_bound - param.level_back * param.row;
-            };
-            if (moved_past_inputs())
-                calc_without_inputs();
-            else
-                calc_with_inputs();
-            int chosen_input = utils::randint(start_bound, end_bound);
-            return chosen_input;
-        };
-        #endif
 
         for (int col = 0; col < param.column; col++) { 
             int start_cells_size = cells.size();
@@ -100,20 +75,20 @@ public:
             param.column, param.row,
             param.allowed_functions.size()
         );
+
         for (int i = reference_bits.input.size(); i < cells.size(); i++) {
             printf("([%d]%d,%d,%d)", i, cells[i].input1, cells[i].input2, static_cast<int>(cells[i].function));
         }
 
-        if (output_indices.size() == 1) {
-            printf("(%d)", output_indices[0]);
-        } else {
-            printf("(%d", output_indices[0]);
-            for (int i = 1; i < output_indices.size(); i++) {
-                printf(",%d", output_indices[i]);
+        std::cout << "(" << output_indices[0];
+        for (int i = 1; i < output_indices.size(); i++) {
+            if (i != output_indices.size()) {
+                std::cout << "," << output_indices[i];
+            } else {
+                std::cout << output_indices[i];
             }
-            printf(")");
         }
-        printf("\n\n");
+        std::cout << ")" << std::endl;
     }
 
     void evaluate(ReferenceBits reference_bits) {
@@ -182,13 +157,11 @@ private:
 
 Circuit &get_fittest_invidiual(std::vector<Circuit> &population) {
     Circuit *best = &population.at(0);
-
     for (int i = 1; i < population.size(); i++) {
         if (population[i].fitness <= best->fitness) {
             best = &population[i];
         }
     }
-
     return *best;
 }
 
@@ -205,11 +178,10 @@ void evolution(Parameters &param, ReferenceBits &reference_bits) {
         population.push_back(c);
     }
 
-    Circuit &fittest = get_fittest_invidiual(population);
+    Circuit fittest = get_fittest_invidiual(population);
     population.pop_back();
 
     for (int gen = 0; gen < param.generations; gen++) {
-        Circuit &fittest = get_fittest_invidiual(population);
         for (int i = 0; i < param.lambda; i++) {
             population[i] = fittest;
             population[i].mutate(param, reference_bits);
@@ -222,6 +194,13 @@ void evolution(Parameters &param, ReferenceBits &reference_bits) {
                 return;
             }
         }
+        Circuit &new_fittest = get_fittest_invidiual(population);
+        if (fittest.fitness >= new_fittest.fitness) {
+            fittest = new_fittest;
+        }
+        if (gen % param.print_count == 0 && param.print_fitness) {
+            std::cout << "generation: " << gen << " best fitness: " << fittest.fitness << std::endl;
+        }
     }
 
     std::cout << "NOT FOUND" << std::endl;
@@ -229,9 +208,9 @@ void evolution(Parameters &param, ReferenceBits &reference_bits) {
 
 int main(int argc, char *argv[]) {
     try {
-        //std::string path("/home/olok/cgp_64bit/data/multiplier2x2.txt");
-        std::string path("/home/olok/cgp_64bit/data/adder5_5.txt");
-        //std::string path("/home/olok/cgp_64bit/data/parity5.txt");
+        //std::string path("/home/olok/cgp_64bit/data/multiplier4x4.txt");
+        std::string path("/home/olok/cgp_64bit/data/adder3_3.txt");
+        //std::string path("/home/olok/cgp_64bit/data/parity9.txt");
         //ReferenceBits reference_bits = parse_file(path);
         if (argc == 2 && std::string(argv[1]) == "-h") {
             utils::print_help();

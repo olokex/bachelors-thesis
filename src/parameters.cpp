@@ -38,6 +38,10 @@ Parameters::Parameters(const int argc, const char * const argv[]) {
             if (!utils::parse_int(mutation_rate, val) || mutation_rate < 0) {
                 throw CGPException("Invalid value for mutate, expected number >= 0");
             }
+        } else if (opt == "printcount") {
+            if (!utils::parse_unsigned_int(print_count, val) || print_count < 1) {
+                throw CGPException("Invalid value for print count, expected number >= 1");
+            }
         } else if (opt == "lback") {
             if (val == "all") {
                 lback_all = true;
