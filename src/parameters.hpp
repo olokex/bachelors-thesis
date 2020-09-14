@@ -18,15 +18,16 @@ public:
         Function::Nor,
         Function::Xnor
     };
-    int lambda = 4;
-    int generations = 5'000'000;
-    int row = 1;
-    int column = 80;
-    int mutation_rate = 5;
-    int level_back = 0;
+    unsigned int lambda = 4;
+    unsigned int generations = 5'000'000;
+    unsigned int row = 1;
+    unsigned int column = 80;
+    unsigned int mutation_rate = 5;
+    unsigned int level_back = 0;
     unsigned int seed = time(nullptr);
     std::string path;
     bool print_fitness = false;
+    bool print_used_gates = false;
     unsigned int print_count = 100'000;
 
     Parameters();

@@ -11,6 +11,7 @@
 #include <exception>
 #include <stdexcept>
 #include <algorithm>
+#include <iomanip>
 #include "my_exception.hpp"
 #include "reference_bits.hpp"
 #include "utils.hpp"
@@ -151,7 +152,42 @@ public:
         }
     }
 
+    void print_used_gates(const int inputs_count, std::vector<Function> allowed) {
+        this->inputs_count = inputs_count;
+        find_path();
+        std::cout << "gates used overall: " << used_gates_indices.size() << std::endl;
+        for (auto &fun : allowed) {
+            int cnt = 0;
+            for (auto &idx : used_gates_indices) {
+                if (cells[idx].function == fun) cnt++;
+            }
+
+            if (cnt > 0) {
+                std::cout.width(4);
+                std::cout.setf(std::ios::left);
+                std::cout << utils::function_name(fun) << " " << cnt << std::endl;
+            }
+        }
+    }
+
 private:
+    std::vector<int> used_gates_indices;
+    int inputs_count;
+
+    void pass_gate(const int idx) {
+        if (idx < inputs_count) return;
+        if (!utils::is_in_vector(used_gates_indices, idx) && cells[idx].function != Function::In) {
+            used_gates_indices.push_back(idx);
+        }
+        pass_gate(cells[idx].input1);
+        pass_gate(cells[idx].input2);
+    }
+
+    void find_path() {
+        for (auto &out : output_indices) {
+            pass_gate(out);
+        }
+    }
 };
 
 
@@ -166,7 +202,7 @@ Circuit &get_fittest_invidiual(std::vector<Circuit> &population) {
 }
 
 
-void evolution(Parameters &param, ReferenceBits &reference_bits) {
+void evolution(const Parameters &param, const ReferenceBits &reference_bits) {
     srand(param.seed);
     std::cout << "seed: " << param.seed << std::endl;
 
@@ -189,8 +225,10 @@ void evolution(Parameters &param, ReferenceBits &reference_bits) {
             population[i].calculate_fitness(reference_bits);
             if (population[i].fitness == 0) {
                 population[i].print_circuit_cgpviewer(param, reference_bits);
-                std::cout << "fitness: " << population[i].fitness << std::endl;
                 std::cout << "generation: " << gen << std::endl;
+                if (param.print_used_gates) {
+                    population[i].print_used_gates(reference_bits.input.size(), param.allowed_functions);
+                }
                 return;
             }
         }
@@ -208,24 +246,19 @@ void evolution(Parameters &param, ReferenceBits &reference_bits) {
 
 int main(int argc, char *argv[]) {
     try {
-        //std::string path("/home/olok/cgp_64bit/data/multiplier4x4.txt");
-        std::string path("/home/olok/cgp_64bit/data/adder3_3.txt");
-        //std::string path("/home/olok/cgp_64bit/data/parity9.txt");
-        //ReferenceBits reference_bits = parse_file(path);
-        if (argc == 2 && std::string(argv[1]) == "-h") {
-            utils::print_help();
-            return 0;
+        if (argc == 2) {
+            std::string opt(argv[1]);
+            if (opt == "-h" || opt == "--help") {
+                utils::print_help();
+                return 0;
+            }
         }
 
-        ReferenceBits reference_bits(path);
         Parameters params(argc, argv);
+        ReferenceBits reference_bits(params.path);
         evolution(params, reference_bits);
-        //Circuit c(params, reference_bits);
-        //c.print_circuit_cgpviewer(params, reference_bits);
-
     } catch (const CGPException &err) {
         std::cerr << "ERROR: " << err.what() << std::endl;
         return 1;
     }
-
 }
