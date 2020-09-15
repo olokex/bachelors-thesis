@@ -154,14 +154,13 @@ public:
 
     void print_used_gates(const int inputs_count, std::vector<Function> allowed) {
         this->inputs_count = inputs_count;
-        find_path();
+        find_used_gates();
+        find_max_delay();
+        std::cout << "max delta of circuit is: " << delta << std::endl;
         std::cout << "gates used overall: " << used_gates_indices.size() << std::endl;
         for (auto &fun : allowed) {
             int cnt = 0;
-            for (auto &idx : used_gates_indices) {
-                if (cells[idx].function == fun) cnt++;
-            }
-
+            cnt = count_gates_within_function(fun);
             if (cnt > 0) {
                 std::cout.width(4);
                 std::cout.setf(std::ios::left);
@@ -173,19 +172,77 @@ public:
 private:
     std::vector<int> used_gates_indices;
     int inputs_count;
+    int delta = 0;
 
-    void pass_gate(const int idx) {
-        if (idx < inputs_count) return;
-        if (!utils::is_in_vector(used_gates_indices, idx) && cells[idx].function != Function::In) {
-            used_gates_indices.push_back(idx);
+    int count_gates_within_function(const Function &fun) {
+        int cnt = 0;
+        for (auto &idx : used_gates_indices) {
+            if (cells[idx].function != fun) continue;
+            cnt++;
         }
-        pass_gate(cells[idx].input1);
-        pass_gate(cells[idx].input2);
+        return cnt;
     }
 
-    void find_path() {
+    bool redundant_gate(const int idx) {
+        if (cells[idx].input1 == cells[idx].input2) {
+            Function fun = cells[idx].function;
+            if (fun == Function::And || fun == Function::Or) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void add_pass_gate(const int idx) {
+        if (idx < inputs_count) return;
+        if (!utils::is_in_vector(used_gates_indices, idx)) {
+            if (cells[idx].function != Function::In && !redundant_gate(idx)) {
+                used_gates_indices.push_back(idx);
+            }
+        }
+        if (cells[idx].function != Function::In && cells[idx].function != Function::Not) {
+            add_pass_gate(cells[idx].input1);
+            add_pass_gate(cells[idx].input2);
+        } else {
+            add_pass_gate(cells[idx].input1);
+        }
+    }
+
+    void find_used_gates() {
         for (auto &out : output_indices) {
-            pass_gate(out);
+            add_pass_gate(out);
+        }
+    }
+
+    int depth(const int idx) {
+        if (idx < inputs_count) return 0;
+        if (cells[idx].function == Function::In) {
+            return 0 + depth(cells[idx].input1);
+        }
+
+        if (cells[idx].function == Function::Not){
+            return 1 + depth(cells[idx].input1);
+        }
+
+        int in1 = depth(cells[idx].input1);
+        int in2 = depth(cells[idx].input2);
+
+        
+        if (in1 > in2) {
+            return(in1 + 1);
+        } else {
+            return(in2 + 1);
+        }
+    }
+
+    void find_max_delay() {
+        int max_delta = 0;
+        for (auto &out : output_indices) {
+            max_delta = depth(out);
+            if (max_delta > delta) {
+                delta = max_delta;
+            }
+            max_delta = 0;
         }
     }
 };

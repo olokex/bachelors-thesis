@@ -76,4 +76,5 @@ std::string utils::function_name(const Function &f) {
     if (f == Function::Nand) return "nand";
     if (f == Function::Nor) return "nor";
     if (f == Function::Xnor) return "xnor";
+    return "unknown error";
 }
