@@ -1,13 +1,14 @@
-#include "parameters.hpp"
 #include <string>
+#include <iostream>
 #include <ctime>
 #include <map>
-#include "utils.hpp"
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <exception>
 #include <stdexcept>
+#include "parameters.hpp"
+#include "../utils.hpp"
 
 Parameters::Parameters() {};
 
@@ -106,4 +107,24 @@ void Parameters::parse_function_list(const std::string &list) {
     if (allowed_functions.size() <= 1) {
         throw std::runtime_error("There is too little functions to work with");
     }
+}
+
+void Parameters::print_help() {
+    std::cout << "Usage of CGP" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Doesn't matter order" << std::endl;
+    std::cout << "If there is any switch missing will be used default value" << std::endl;
+    std::cout << "switch value => invalid value will be announced within each option" << std::endl;
+    std::cout << std::endl;
+    std::cout << "lambda 4" << std::endl;
+    std::cout << "generations 100000" << std::endl;
+    std::cout << "row 10" << std::endl;
+    std::cout << "column 5" << std::endl;
+    std::cout << "mutate 5" << std::endl;
+    std::cout << "printcount 10000 (for effect need to be combined with switch below" << std::endl;
+    std::cout << "printfitness true" << std::endl;
+    std::cout << "lback all" << std::endl;
+    std::cout << "seed 178846" << std::endl;
+    std::cout << "path ./file.txt" << std::endl;
+    std::cout << "functions or,and,not" << std::endl;
 }

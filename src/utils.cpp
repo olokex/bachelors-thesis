@@ -1,5 +1,3 @@
-#include "utils.hpp"
-#include "function.hpp"
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
@@ -8,6 +6,7 @@
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
+#include "utils.hpp"
 
 bool utils::parse_int(int &value, const std::string &str) {
     try {
@@ -30,26 +29,6 @@ bool utils::parse_unsigned_int(unsigned int &value, const std::string &str) {
         }
     }
 
-void utils::print_help() {
-    std::cout << "Usage of CGP" << std::endl;
-    std::cout << std::endl;
-    std::cout << "Doesn't matter order" << std::endl;
-    std::cout << "If there is any switch missing will be used default value" << std::endl;
-    std::cout << "switch value => invalid value will be announced within each option" << std::endl;
-    std::cout << std::endl;
-    std::cout << "lambda 4" << std::endl;
-    std::cout << "generations 100000" << std::endl;
-    std::cout << "row 10" << std::endl;
-    std::cout << "column 5" << std::endl;
-    std::cout << "mutate 5" << std::endl;
-    std::cout << "printcount 10000 (for effect need to be combined with switch below" << std::endl;
-    std::cout << "printfitness true" << std::endl;
-    std::cout << "lback all" << std::endl;
-    std::cout << "seed 178846" << std::endl;
-    std::cout << "path ./file.txt" << std::endl;
-    std::cout << "functions or,and,not" << std::endl;
-}
-
 std::vector<std::string> utils::split(const std::string &functions, const char delimiter) {
     std::stringstream ss(functions);
     std::string token;
@@ -64,19 +43,4 @@ int utils::randint(const int &bottom, const int &top) {
     if (bottom >= top) throw std::invalid_argument("Bad range for randint A < B");
     //return rand() % (top - (bottom - 1)) + bottom; // includes top and bot
     return rand() % (top - bottom) + bottom; // excludes top
-}
-
-std::string utils::function_name(const Function &f) {
-    switch (f) {
-        case Function::In: return "in";
-        case Function::Not: return "not";
-        case Function::And: return "and";
-        case Function::Or: return "or";
-        case Function::Xor: return "xor";
-        case Function::Nand: return "nand";
-        case Function::Nor: return "nor";
-        case Function::Xnor: return "xnor";
-        default:
-            return "unknown gate name - shouldn't appear in any way";
-    }
 }

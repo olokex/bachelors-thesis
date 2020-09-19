@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 #include "function.hpp"
-#include "utils.hpp"
+#include "../utils.hpp"
 
 class Parameters {
 public:
@@ -32,6 +32,7 @@ public:
 
     Parameters();
     Parameters(const int argc, const char * const argv[]);
+    static void print_help();
 
 private:
     const std::map<std::string, Function> function_list = {
