@@ -27,23 +27,10 @@ public:
 };
 
 class Circuit {
-private:
-    std::vector<Cell> cells;
-    std::vector<int> output_indices;
-
-    void push_inputs(ReferenceBits reference_bits) {
-        for (auto input : reference_bits.input) {
-            Cell c;
-            c.function = Function::In;
-            c.output = input;
-            cells.push_back(c);
-        }
-    }
-
 public:
     unsigned int fitness = UINT_MAX;
 
-    Circuit(Parameters param, ReferenceBits reference_bits) {
+    Circuit(const Parameters &param, const ReferenceBits &reference_bits) {
         push_inputs(reference_bits);
         auto random_input = [&](int start_cells_size, int col) {
             return utils::randint(
@@ -69,7 +56,7 @@ public:
 
     }
 
-    void print_circuit_cgpviewer(Parameters param, ReferenceBits reference_bits) {
+    void print_circuit_cgpviewer(const Parameters &param, const ReferenceBits &reference_bits) {
         printf("{%d,%d,%d,%d,2,1,%d}",
             reference_bits.input.size(),
             reference_bits.output.size(),
@@ -92,8 +79,8 @@ public:
         std::cout << ")" << std::endl;
     }
 
-    void evaluate(ReferenceBits reference_bits) {
-        for (auto it = cells.begin() + reference_bits.input.size(); it != cells.end(); it++) {
+    void evaluate(const int &input_size) {
+        for (auto it = cells.begin() + input_size; it != cells.end(); it++) {
             Bitset &in1 = cells[it->input1].output;
             Bitset &in2 = cells[it->input2].output;
 
@@ -110,27 +97,26 @@ public:
         }
     }
 
-    void calculate_fitness(ReferenceBits reference_bits) {
+    void calculate_fitness(const ReferenceBits &reference_bits) {
         fitness = 0;
         for (int i = 0; i < output_indices.size(); i++) {
             fitness += (reference_bits.output[i] ^ cells[output_indices[i]].output).count();
         }
     }
 
-    void mutate(Parameters param, ReferenceBits reference_bits) {
-        int inputs_size = reference_bits.input.size();
+    void mutate(const int &mutation_rate, const std::vector<Function> &allowed_functions, const int &inputs_count) {
         int cells_size = cells.size();
 
-        for (int i = 0; i < param.mutation_rate; i++) {
-            int rnd_idx = utils::randint(inputs_size, cells_size + output_indices.size());
+        for (int i = 0; i < mutation_rate; i++) {
+            int rnd_idx = utils::randint(inputs_count, cells_size + output_indices.size());
 
             if (rnd_idx >= cells_size) {
-                output_indices[rnd_idx - cells_size] = utils::randint(inputs_size, cells_size);
+                output_indices[rnd_idx - cells_size] = utils::randint(inputs_count, cells_size);
             } else {
                 int allela = utils::randint(0, 3);
                 switch (allela) {
                     case 0:
-                        cells[rnd_idx].function = param.allowed_functions[rand() % param.allowed_functions.size()];
+                        cells[rnd_idx].function = allowed_functions[rand() % allowed_functions.size()];
                         break;
                     case 1:
                         cells[rnd_idx].input1 = utils::randint(0, rnd_idx);
@@ -143,7 +129,7 @@ public:
         }
     }
 
-    void print_bits(ReferenceBits reference_bits) {
+    void print_bits(const ReferenceBits &reference_bits) {
         for (int i = 0; i < reference_bits.input.size(); i++) {
             std::cout << "input " << i << ": " << reference_bits.input[i] << std::endl;
         }
@@ -152,7 +138,7 @@ public:
         }
     }
 
-    void print_used_gates(const int inputs_count, std::vector<Function> allowed) {
+    void print_used_gates(const int &inputs_count, const std::vector<Function> &allowed) {
         this->inputs_count = inputs_count;
         find_used_gates();
         find_max_delay();
@@ -170,9 +156,20 @@ public:
     }
 
 private:
+    std::vector<Cell> cells;
+    std::vector<int> output_indices;
     std::vector<int> used_gates_indices;
     int inputs_count;
     int delta = 0;
+
+    void push_inputs(const ReferenceBits &reference_bits) {
+        for (auto input : reference_bits.input) {
+            Cell c;
+            c.function = Function::In;
+            c.output = input;
+            cells.push_back(c);
+        }
+    }
 
     int count_gates_within_function(const Function &fun) {
         int cnt = 0;
@@ -183,7 +180,7 @@ private:
         return cnt;
     }
 
-    bool redundant_gate(const int idx) {
+    bool redundant_gate(const int &idx) {
         if (cells[idx].input1 == cells[idx].input2) {
             Function fun = cells[idx].function;
             if (fun == Function::And || fun == Function::Or) {
@@ -193,7 +190,7 @@ private:
         return false;
     }
 
-    void add_pass_gate(const int idx) {
+    void add_pass_gate(const int &idx) {
         if (idx < inputs_count) return;
         if (!utils::is_in_vector(used_gates_indices, idx)) {
             if (cells[idx].function != Function::In && !redundant_gate(idx)) {
@@ -214,8 +211,13 @@ private:
         }
     }
 
-    int depth(const int idx) {
+    int depth(const int &idx) {
         if (idx < inputs_count) return 0;
+
+        if (redundant_gate(idx)) {
+            return 0 + depth(cells[idx].input1);
+        }
+
         if (cells[idx].function == Function::In) {
             return 0 + depth(cells[idx].input1);
         }
@@ -227,11 +229,10 @@ private:
         int in1 = depth(cells[idx].input1);
         int in2 = depth(cells[idx].input2);
 
-        
         if (in1 > in2) {
-            return(in1 + 1);
+            return in1 + 1;
         } else {
-            return(in2 + 1);
+            return in2 + 1;
         }
     }
 
@@ -247,8 +248,7 @@ private:
     }
 };
 
-
-Circuit &get_fittest_invidiual(std::vector<Circuit> &population) {
+inline Circuit &get_fittest_invidiual(std::vector<Circuit> &population) {
     Circuit *best = &population.at(0);
     for (int i = 1; i < population.size(); i++) {
         if (population[i].fitness <= best->fitness) {
@@ -258,7 +258,6 @@ Circuit &get_fittest_invidiual(std::vector<Circuit> &population) {
     return *best;
 }
 
-
 void evolution(const Parameters &param, const ReferenceBits &reference_bits) {
     srand(param.seed);
     std::cout << "seed: " << param.seed << std::endl;
@@ -266,7 +265,7 @@ void evolution(const Parameters &param, const ReferenceBits &reference_bits) {
     std::vector<Circuit> population;
     for (int i = 0; i < param.lambda + 1; i++) {
         Circuit c(param, reference_bits);
-        c.evaluate(reference_bits);
+        c.evaluate(reference_bits.input.size());
         c.calculate_fitness(reference_bits);
         population.push_back(c);
     }
@@ -277,8 +276,8 @@ void evolution(const Parameters &param, const ReferenceBits &reference_bits) {
     for (int gen = 0; gen < param.generations; gen++) {
         for (int i = 0; i < param.lambda; i++) {
             population[i] = fittest;
-            population[i].mutate(param, reference_bits);
-            population[i].evaluate(reference_bits);
+            population[i].mutate(param.mutation_rate, param.allowed_functions, reference_bits.input.size());
+            population[i].evaluate(reference_bits.input.size());
             population[i].calculate_fitness(reference_bits);
             if (population[i].fitness == 0) {
                 population[i].print_circuit_cgpviewer(param, reference_bits);
