@@ -1,5 +1,11 @@
 #ifndef CIRCUIT_H
 #define CIRCUIT_H
+#include "../reference_bits.hpp"
+#include "parameters.hpp"
+#include "cell.hpp"
+#include "function.hpp"
+#include <vector>
+
 
 class Circuit {
 public:
@@ -7,11 +13,11 @@ public:
 
     Circuit(const Parameters &param, const ReferenceBits &reference_bits);
     void print_circuit_cgpviewer(const Parameters &param, const ReferenceBits &reference_bits);
-    void evaluate(const int &input_size);
+    void evaluate(const int input_size);
     void calculate_fitness(const ReferenceBits &reference_bits);
-    void mutate(const int &mutation_rate, const std::vector<Function> &allowed_functions, const int &inputs_count);
+    void mutate(const int mutation_rate, const std::vector<Function> &allowed_functions, const int inputs_count);
     void print_bits(const ReferenceBits &reference_bits);
-    void print_used_gates(const int &inputs_count, const std::vector<Function> &allowed);
+    void print_used_gates(const int inputs_count, const std::vector<Function> &allowed);
 
 private:
     std::vector<Cell> cells;
@@ -21,11 +27,11 @@ private:
     int delta = 0;
 
     void push_inputs(const ReferenceBits &reference_bits);
-    int count_gates_within_function(const Function &fun);
-    bool redundant_gate(const int &idx);
-    void add_pass_gate(const int &idx);
+    int count_gates_within_function(const Function fun);
+    bool redundant_gate(const int idx);
+    void add_pass_gate(const int idx);
     void find_used_gates();
-    int depth(const int &idx);
+    int depth(const int idx);
     void find_max_delay();
 };
 

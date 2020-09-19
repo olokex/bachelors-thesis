@@ -14,8 +14,8 @@ public:
 
 private:
     std::vector<std::string> remove_unnecessary(std::ifstream &fp);
-    void input_append(const std::string bits);
-    void output_append(const std::string bits);
+    void input_append(const std::string &bits);
+    void output_append(const std::string &bits);
 };
 
 #endif /* REFERENCE_BITS_H */

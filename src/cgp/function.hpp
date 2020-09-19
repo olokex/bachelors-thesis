@@ -13,7 +13,7 @@ enum class Function {
     Xnor,
 };
 
-static inline std::string function_name(const Function &f) {
+static inline std::string function_name(const Function f) {
     switch (f) {
         case Function::In: return "in";
         case Function::Not: return "not";

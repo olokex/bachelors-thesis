@@ -39,7 +39,7 @@ std::vector<std::string> utils::split(const std::string &functions, const char d
     return list;
 }
 
-int utils::randint(const int &bottom, const int &top) {
+int utils::randint(const int bottom, const int top) {
     if (bottom >= top) throw std::invalid_argument("Bad range for randint A < B");
     //return rand() % (top - (bottom - 1)) + bottom; // includes top and bot
     return rand() % (top - bottom) + bottom; // excludes top

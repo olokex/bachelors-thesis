@@ -51,10 +51,10 @@ std::vector<std::string> ReferenceBits::remove_unnecessary(std::ifstream &fp) {
     return clean_file;
 }
 
-void ReferenceBits::input_append(const std::string bits) {
+void ReferenceBits::input_append(const std::string &bits) {
     input.push_back(Bitset(bits));
 }
 
-void  ReferenceBits::output_append(const std::string bits) {
+void  ReferenceBits::output_append(const std::string &bits) {
     output.push_back(Bitset(bits));
 }

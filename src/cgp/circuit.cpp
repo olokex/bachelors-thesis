@@ -53,7 +53,7 @@ void Circuit::print_circuit_cgpviewer(const Parameters &param, const ReferenceBi
     std::cout << ")" << std::endl;
 }
 
-void Circuit::evaluate(const int &input_size) {
+void Circuit::evaluate(const int input_size) {
     for (auto it = cells.begin() + input_size; it != cells.end(); it++) {
         Bitset &in1 = cells[it->input1].output;
         Bitset &in2 = cells[it->input2].output;
@@ -78,7 +78,7 @@ void Circuit::calculate_fitness(const ReferenceBits &reference_bits) {
     }
 }
 
-void Circuit::mutate(const int &mutation_rate, const std::vector<Function> &allowed_functions, const int &inputs_count) {
+void Circuit::mutate(const int mutation_rate, const std::vector<Function> &allowed_functions, const int inputs_count) {
     int cells_size = cells.size();
 
     for (int i = 0; i < mutation_rate; i++) {
@@ -112,7 +112,7 @@ void Circuit::print_bits(const ReferenceBits &reference_bits) {
     }
 }
 
-void Circuit::print_used_gates(const int &inputs_count, const std::vector<Function> &allowed) {
+void Circuit::print_used_gates(const int inputs_count, const std::vector<Function> &allowed) {
     this->inputs_count = inputs_count;
     find_used_gates();
     find_max_delay();
@@ -140,7 +140,7 @@ void Circuit::push_inputs(const ReferenceBits &reference_bits) {
     }
 }
 
-int Circuit::count_gates_within_function(const Function &fun) {
+int Circuit::count_gates_within_function(const Function fun) {
     int cnt = 0;
     for (auto &idx : used_gates_indices) {
         if (cells[idx].function != fun) continue;
@@ -149,7 +149,7 @@ int Circuit::count_gates_within_function(const Function &fun) {
     return cnt;
 }
 
-bool Circuit::redundant_gate(const int &idx) {
+bool Circuit::redundant_gate(const int idx) {
     if (cells[idx].input1 == cells[idx].input2) {
         Function fun = cells[idx].function;
         if (fun == Function::And || fun == Function::Or) {
@@ -159,7 +159,7 @@ bool Circuit::redundant_gate(const int &idx) {
     return false;
 }
 
-void Circuit::add_pass_gate(const int &idx) {
+void Circuit::add_pass_gate(const int idx) {
     if (idx < inputs_count) return;
     if (!utils::is_in_vector(used_gates_indices, idx)) {
         if (cells[idx].function != Function::In && !redundant_gate(idx)) {
@@ -180,7 +180,7 @@ void Circuit::find_used_gates() {
     }
 }
 
-int Circuit::depth(const int &idx) {
+int Circuit::depth(const int idx) {
     if (idx < inputs_count) return 0;
 
     if (redundant_gate(idx)) {

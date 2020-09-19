@@ -8,7 +8,7 @@ namespace utils {
     bool parse_unsigned_int(unsigned int &value, const std::string &str);
     bool parse_int(int &value, const std::string &str);
     std::vector<std::string> split(const std::string &functions, const char delimiter=',');
-    int randint(const int &bottom, const int &top);
+    int randint(const int bottom, const int top);
 
     template<class T>
     bool check_duplicates(const std::vector<T> &vec) {
