@@ -1,10 +1,11 @@
 #include "reference_bits.hpp"
-#include "my_exception.hpp"
 #include <boost/dynamic_bitset.hpp>
 #include <vector>
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <exception>
+#include <stdexcept>
 
 ReferenceBits::ReferenceBits(const std::string &path) {
     std::ifstream fp;
@@ -12,7 +13,7 @@ ReferenceBits::ReferenceBits(const std::string &path) {
     fp.open(path);
 
     if (!fp.is_open()) {
-        throw CGPException("opening file `" + path + "` failed");
+        throw std::runtime_error("opening file `" + path + "` failed");
     }
 
     std::vector<std::string> file_clear = remove_unnecessary(fp);
@@ -20,10 +21,10 @@ ReferenceBits::ReferenceBits(const std::string &path) {
     line = file_clear.front();
     size_t delimiter = line.find(':');
 
-    for (int col = 0; col < line.size(); col++) {
+    for (size_t col = 0; col < line.size(); col++) {
         if (col == delimiter) continue;
         std::string bits;
-        for (int row = 0; row < file_clear.size(); row++) {
+        for (size_t row = 0; row < file_clear.size(); row++) {
             bits += file_clear[row][col];
         }
         if (col < delimiter) {

@@ -35,7 +35,6 @@ add_executable(cgp
     src/parameters.hpp
     src/utils.hpp
     src/reference_bits.hpp
-    src/my_exception.hpp
     src/parameters.cpp
     src/utils.cpp
     src/reference_bits.cpp

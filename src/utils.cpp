@@ -1,5 +1,4 @@
 #include "utils.hpp"
-#include "my_exception.hpp"
 #include "function.hpp"
 #include <string>
 #include <boost/lexical_cast.hpp>
@@ -14,7 +13,7 @@ bool utils::parse_int(int &value, const std::string &str) {
     try {
         value = boost::lexical_cast<int>(str);
         return true;
-    } catch (boost::bad_lexical_cast) {
+    } catch (const boost::bad_lexical_cast&) {
         return false;
     }
 }
@@ -26,7 +25,7 @@ bool utils::parse_unsigned_int(unsigned int &value, const std::string &str) {
                 throw boost::bad_lexical_cast();
             }
             return true;
-        } catch (boost::bad_lexical_cast) {
+        } catch (const boost::bad_lexical_cast&) {
             return false;
         }
     }
@@ -68,13 +67,16 @@ int utils::randint(const int &bottom, const int &top) {
 }
 
 std::string utils::function_name(const Function &f) {
-    if (f == Function::In) return "in";
-    if (f == Function::Not) return "not";
-    if (f == Function::And) return "and";
-    if (f == Function::Or) return "or";
-    if (f == Function::Xor) return "xor";
-    if (f == Function::Nand) return "nand";
-    if (f == Function::Nor) return "nor";
-    if (f == Function::Xnor) return "xnor";
-    return "unknown gate name - shouldn't appear in any way";
+    switch (f) {
+        case Function::In: return "in";
+        case Function::Not: return "not";
+        case Function::And: return "and";
+        case Function::Or: return "or";
+        case Function::Xor: return "xor";
+        case Function::Nand: return "nand";
+        case Function::Nor: return "nor";
+        case Function::Xnor: return "xnor";
+        default:
+            return "unknown gate name - shouldn't appear in any way";
+    }
 }

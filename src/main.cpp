@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <iomanip>
-#include "my_exception.hpp"
+//#include "my_exception.hpp"
 #include "reference_bits.hpp"
 #include "utils.hpp"
 #include "function.hpp"
@@ -49,27 +49,25 @@ public:
             }
         }
 
-        for (int i = 0; i < reference_bits.output.size(); i++) {
+        for (unsigned int i = 0; i < reference_bits.output.size(); i++) {
             output_indices.push_back(random_input(cells.size(), param.column + 1));
         }
-        
-
     }
 
     void print_circuit_cgpviewer(const Parameters &param, const ReferenceBits &reference_bits) {
-        printf("{%d,%d,%d,%d,2,1,%d}",
+        printf("{%ld,%ld,%d,%d,2,1,%ld}",
             reference_bits.input.size(),
             reference_bits.output.size(),
             param.column, param.row,
             param.allowed_functions.size()
         );
 
-        for (int i = reference_bits.input.size(); i < cells.size(); i++) {
+        for (unsigned int i = reference_bits.input.size(); i < cells.size(); i++) {
             printf("([%d]%d,%d,%d)", i, cells[i].input1, cells[i].input2, static_cast<int>(cells[i].function));
         }
 
         std::cout << "(" << output_indices[0];
-        for (int i = 1; i < output_indices.size(); i++) {
+        for (unsigned int i = 1; i < output_indices.size(); i++) {
             if (i != output_indices.size()) {
                 std::cout << "," << output_indices[i];
             } else {
@@ -99,7 +97,7 @@ public:
 
     void calculate_fitness(const ReferenceBits &reference_bits) {
         fitness = 0;
-        for (int i = 0; i < output_indices.size(); i++) {
+        for (unsigned int i = 0; i < output_indices.size(); i++) {
             fitness += (reference_bits.output[i] ^ cells[output_indices[i]].output).count();
         }
     }
@@ -130,10 +128,10 @@ public:
     }
 
     void print_bits(const ReferenceBits &reference_bits) {
-        for (int i = 0; i < reference_bits.input.size(); i++) {
+        for (unsigned int i = 0; i < reference_bits.input.size(); i++) {
             std::cout << "input " << i << ": " << reference_bits.input[i] << std::endl;
         }
-        for (int i = reference_bits.input.size(); i < cells.size(); i++) {
+        for (unsigned int i = reference_bits.input.size(); i < cells.size(); i++) {
             std::cout << "component " << i << ": " << cells[i].output << std::endl;
         }
     }
@@ -248,16 +246,6 @@ private:
     }
 };
 
-inline Circuit &get_fittest_invidiual(std::vector<Circuit> &population) {
-    Circuit *best = &population.at(0);
-    for (int i = 1; i < population.size(); i++) {
-        if (population[i].fitness <= best->fitness) {
-            best = &population[i];
-        }
-    }
-    return *best;
-}
-
 void evolution(const Parameters &param, const ReferenceBits &reference_bits) {
     srand(param.seed);
     std::cout << "seed: " << param.seed << std::endl;
@@ -270,10 +258,10 @@ void evolution(const Parameters &param, const ReferenceBits &reference_bits) {
         population.push_back(c);
     }
 
-    Circuit fittest = get_fittest_invidiual(population);
+    Circuit fittest = utils::get_fittest_invidiual(population);
     population.pop_back();
 
-    for (int gen = 0; gen < param.generations; gen++) {
+    for (unsigned int gen = 0; gen < param.generations; gen++) {
         for (int i = 0; i < param.lambda; i++) {
             population[i] = fittest;
             population[i].mutate(param.mutation_rate, param.allowed_functions, reference_bits.input.size());
@@ -288,7 +276,7 @@ void evolution(const Parameters &param, const ReferenceBits &reference_bits) {
                 return;
             }
         }
-        Circuit &new_fittest = get_fittest_invidiual(population);
+        Circuit &new_fittest = utils::get_fittest_invidiual(population);
         if (fittest.fitness >= new_fittest.fitness) {
             fittest = new_fittest;
         }
@@ -313,8 +301,8 @@ int main(int argc, char *argv[]) {
         Parameters params(argc, argv);
         ReferenceBits reference_bits(params.path);
         evolution(params, reference_bits);
-    } catch (const CGPException &err) {
-        std::cerr << "ERROR: " << err.what() << std::endl;
+    } catch (const std::runtime_error &err) {
+        std::cerr << "ERROR runtime: " << err.what() << std::endl;
         return 1;
     }
 }
