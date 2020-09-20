@@ -31,11 +31,17 @@ add_executable(cgp
 
 # add the executable
 add_executable(anf
-    #src/cgp/main.cpp
-    #src/cgp/parameters.hpp
+    src/anf/main.cpp
+    src/anf/parameters.hpp
     src/anf/parameters.cpp
-    #src/reference_bits.hpp
-    #src/reference_bits.cpp
-    #src/utils.hpp
-    #src/utils.cpp
+    src/anf/cell.hpp
+    src/anf/state.hpp
+    src/anf/term.hpp
+    src/anf/term.cpp
+    src/anf/circuit.hpp
+    src/anf/circuit.cpp
+    src/reference_bits.hpp
+    src/reference_bits.cpp
+    src/utils.hpp
+    src/utils.cpp
 )

@@ -1,5 +1,13 @@
-#include <iostream>
+#include "parameters.hpp"
 
-int main() {
-    std::cout << "hello anf" << std::endl;
+Parameters::Parameters() {
+    
 }
+
+Parameters::Parameters(const int argc, const char * const argv[]) {
+
+}
+
+void Parameters::print_help() {
+
+};
