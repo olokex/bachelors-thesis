@@ -14,7 +14,7 @@ public:
     int gate_xor_count = 0;
 
     Literal(const int literal_count, const ReferenceBits &reference_bits);
-    void calculate_fitness(const Parameters &param, const ReferenceBits &reference_bits, const int idx_out);
+    void calculate_fitness(const int literal_count, const ReferenceBits &reference_bits, const int idx_out);
     void print_circuit(const int inputs_count);
     void print_circuit_ascii_only(const int inputs_count);
     void print_bits(const int literal_count, const int inputs_count);

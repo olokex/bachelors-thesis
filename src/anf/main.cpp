@@ -25,7 +25,9 @@ void evolution(const Parameters &p, const ReferenceBits &ref) {
             population[i] = fittest;
             //population[i].mutate_overall(p.mutation, ref);
             //population[i].mutate_in_row(p.mutation_row, ref);
-            population[i].mutate_uniform(ref, p.uniform_mutation);
+            //population[i].mutate_uniform(ref, p.uniform_mutation);
+            population[i].crossover(fittest);
+            population[i].mutate_overall(p.mutation, ref);
             population[i].calculate_fitness(p, ref);
             if (population[i].fitness == 0) {
                 std::cout << "generation: " << gen << std::endl;

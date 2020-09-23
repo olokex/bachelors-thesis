@@ -21,11 +21,11 @@ Literal::Literal(const int literal_count, const ReferenceBits &reference_bits) {
     }
 }
 
-void Literal::calculate_fitness(const Parameters &param, const ReferenceBits &reference_bits, const int idx_out) {
+void Literal::calculate_fitness(const int literal_count, const ReferenceBits &reference_bits, const int idx_out) {
     unsigned int inputs_count = reference_bits.input.size();
     unsigned int bits_count = reference_bits.input[0].size();
     Bitset out = evaluate_subliteral(bits_count, inputs_count, 0);
-    for (int i = 1; i < param.literal_count; i++) {
+    for (int i = 1; i < literal_count; i++) {
         out = out ^ evaluate_subliteral(bits_count, inputs_count, inputs_count * i);
     }
     out = out ^ reference_bits.output[idx_out];

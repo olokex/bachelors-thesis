@@ -8,7 +8,6 @@
 class Circuit {
 public:
     uint fitness = UINT_MAX;
-    int used_gates = INT_MAX;
 
     Circuit(const int literal_count, const ReferenceBits &reference_bits);
     void print_circuit(const int inputs_count, const bool print_ascii);
@@ -19,8 +18,7 @@ public:
     void mutate_overall(const int mutation, const ReferenceBits &reference_bits);
     void mutate_in_row(const int mutate, const ReferenceBits &reference_bits);
     void mutate_uniform(const ReferenceBits &reference_bits, const int uniform_mutate);
-    void crossover_fixed(const int subliterals_count);
-    void crossover_random();
+    void crossover(const Circuit &c);
 
 private:
     std::vector<Literal> literals;
