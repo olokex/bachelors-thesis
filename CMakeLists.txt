@@ -36,8 +36,8 @@ add_executable(anf
     src/anf/parameters.cpp
     src/anf/cell.hpp
     src/anf/state.hpp
-    src/anf/term.hpp
-    src/anf/term.cpp
+    src/anf/literal.hpp
+    src/anf/literal.cpp
     src/anf/circuit.hpp
     src/anf/circuit.cpp
     src/reference_bits.hpp

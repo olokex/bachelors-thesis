@@ -1,13 +1,16 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
+#include "../reference_bits.hpp"
 #include <string>
 
 class Parameters {
 public:
     int lambda = 4;
-    int literal_count = 10;
+    int literal_count = 0;
     int mutation = 2;
+    int mutation_row = 3;
     int uniform_mutation = 1;
+    bool crossover = false;
     unsigned int generations = 5'000'000;
     unsigned int seed = time(nullptr);
     std::string path;
@@ -18,6 +21,7 @@ public:
 
     Parameters();
     Parameters(const int argc, const char * const argv[]);
+    void is_valid(const ReferenceBits &reference_bits);
     static void print_help();
 };
 

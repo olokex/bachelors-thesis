@@ -3,19 +3,27 @@
 #include <vector>
 #include "../reference_bits.hpp"
 #include "parameters.hpp"
-#include "term.hpp"
+#include "literal.hpp"
 
 class Circuit {
 public:
     uint fitness = UINT_MAX;
+    int used_gates = INT_MAX;
 
     Circuit(const int literal_count, const ReferenceBits &reference_bits);
-    void mutate(const int mutation, const ReferenceBits &reference_bits);
-    void print_circuit(const int inputs_count);
+    void print_circuit(const int inputs_count, const bool print_ascii);
     void calculate_fitness(const Parameters &param, const ReferenceBits &reference_bits);
+    
+    void print_used_gates(const int subliteral_count, const int inputs_count);
+
+    void mutate_overall(const int mutation, const ReferenceBits &reference_bits);
+    void mutate_in_row(const int mutate, const ReferenceBits &reference_bits);
+    void mutate_uniform(const ReferenceBits &reference_bits, const int uniform_mutate);
+    void crossover_fixed(const int subliterals_count);
+    void crossover_random();
 
 private:
-    std::vector<Term> terms;
+    std::vector<Literal> literals;
 };
 
 
