@@ -7,9 +7,8 @@
 #include "cell.hpp"
 #include "circuit.hpp"
 
-
 Circuit::Circuit(const int literal_count, const ReferenceBits &reference_bits) {
-    for (auto &out : reference_bits.output) {
+    for (size_t i = 0; i < reference_bits.output.size(); i++) {
         Literal literal(literal_count, reference_bits);
         literals.push_back(literal);
     }
@@ -37,14 +36,14 @@ void Circuit::mutate_uniform(const ReferenceBits &reference_bits, const int muta
 }
 
 void Circuit::crossover(const Circuit &c) {
-    for (int i = 0; i < literals.size(); i++) {
+    for (size_t i = 0; i < literals.size(); i++) {
         if (utils::randint(0, 2) == 0) {
             literals[i] = c.literals[i];
         }
     }
 }
 
-void Circuit::print_used_gates(const int subliteral_count, const int inputs_count) {
+void Circuit::print_used_gates(const int inputs_count) {
     int gate_and_count = 0;
     int gate_not_count = 0;
     int gates_unused = 0;
@@ -65,7 +64,7 @@ void Circuit::print_used_gates(const int subliteral_count, const int inputs_coun
 }
 
 void Circuit::print_circuit(const int inputs_count, const bool print_ascii) {
-    for (int i = 0; i < literals.size(); i++) {
+    for (size_t i = 0; i < literals.size(); i++) {
         std::cout << "y" << i << " = ";
         if (print_ascii) {
             literals[i].print_circuit_ascii_only(inputs_count);
@@ -77,7 +76,7 @@ void Circuit::print_circuit(const int inputs_count, const bool print_ascii) {
 
 void Circuit::calculate_fitness(const Parameters &param, const ReferenceBits &reference_bits) {
     uint tmp_fit = 0;
-    for (int i = 0; i < literals.size(); i++) {
+    for (size_t i = 0; i < literals.size(); i++) {
         literals[i].calculate_fitness(param.literal_count, reference_bits, i);
         tmp_fit += literals[i].fitness;
     }

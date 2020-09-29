@@ -26,13 +26,15 @@ void evolution(const Parameters &p, const ReferenceBits &ref) {
             //population[i].mutate_overall(p.mutation, ref);
             //population[i].mutate_in_row(p.mutation_row, ref);
             //population[i].mutate_uniform(ref, p.uniform_mutation);
-            population[i].crossover(fittest);
             population[i].mutate_overall(p.mutation, ref);
+            //population[i].crossover(fittest);
             population[i].calculate_fitness(p, ref);
             if (population[i].fitness == 0) {
-                std::cout << "generation: " << gen << std::endl;
                 population[i].print_circuit(ref.input.size(), p.print_ascii);
-                population[i].print_used_gates(p.literal_count, ref.input.size());
+                std::cout << "generation: " << gen << std::endl;
+                if (p.print_used_gates) {
+                    population[i].print_used_gates(ref.input.size());
+                }
                 return;
             }
         }
@@ -49,7 +51,6 @@ void evolution(const Parameters &p, const ReferenceBits &ref) {
 
 int main(int argc, char *argv[]) {
     try {
-
         Parameters p(argc, argv);
         ReferenceBits ref(p.path);
         p.is_valid(ref);

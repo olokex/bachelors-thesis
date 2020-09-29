@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
         ReferenceBits reference_bits(params.path);
         evolution(params, reference_bits);
     } catch (const std::runtime_error &err) {
-        std::cerr << "ERROR runtime: " << err.what() << std::endl;
+        std::cerr << "ERROR: " << err.what() << std::endl;
         return 1;
     }
 }

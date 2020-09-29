@@ -8,7 +8,7 @@
 
 Literal::Literal(const int literal_count, const ReferenceBits &reference_bits) {
     for (int y = 0; y < literal_count; y++) {
-        for (int i = 0; i < reference_bits.input.size(); i++) {
+        for (size_t i = 0; i < reference_bits.input.size(); i++) {
             Cell c;
             c.state = State(utils::randint(0, 3));
             if (c.state == State::Not) {
@@ -97,7 +97,7 @@ void Literal::mutate(const ReferenceBits &reference_bits) {
 }
 
 void Literal::uniform_mutation(const ReferenceBits &reference_bits, const int chance) {
-    for (int i = 0; i < cells.size(); i++) {
+    for (size_t i = 0; i < cells.size(); i++) {
         if (utils::randint(0, 100) < chance) {
             State new_state = State(utils::randint(0, 3));
             if (cells[i].state == new_state) continue;
@@ -112,7 +112,6 @@ void Literal::uniform_mutation(const ReferenceBits &reference_bits, const int ch
         }
     }
 }
-
 
 Bitset Literal::evaluate_subliteral(const int bits_count, const int input_count, const int start) {
     Bitset out(bits_count, 0);
@@ -139,7 +138,7 @@ int Literal::count_state(const int subliteral, const int inputs_count, State s) 
 
 void Literal::used_gates_count(const int inputs_count) {
     gate_xor_count = (cells.size() / inputs_count) - 1;
-    for (int subliteral = 0; subliteral < (cells.size() / inputs_count); subliteral++) {
+    for (size_t subliteral = 0; subliteral < (cells.size() / inputs_count); subliteral++) {
         int not_count = count_state(subliteral, inputs_count, State::Not);
         int is_count = count_state(subliteral, inputs_count, State::Is);
         

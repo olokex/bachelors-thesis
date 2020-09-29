@@ -77,7 +77,7 @@ void Parameters::print_help() {
 };
 
 void Parameters::is_valid(const ReferenceBits &reference_bits) {
-    unsigned int input_size = reference_bits.input.size();
+    int input_size = reference_bits.input.size();
     if (literal_count == 0) {
         literal_count = input_size;
     }

@@ -81,6 +81,8 @@ Parameters::Parameters(const int argc, const char * const argv[]) {
     } else if (level_back == 0) {
         level_back = column;
     }
+    /*     input1, input2, function => 3                       */
+    mutation_rate = (((column * row) * 3) / 100) * mutation_rate;
 }
 
 void Parameters::function_append(const std::string &fun) {
