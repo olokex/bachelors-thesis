@@ -63,7 +63,7 @@ void Literal::print_circuit_ascii_only(const int inputs_count) {
         } else {
             std::cout << "0";
         }
-        if (x_cnt != 4) std::cout << ",";
+        if (x_cnt != inputs_count - 1) std::cout << ",";
         cnt++;
     }
     std::cout << "]";
