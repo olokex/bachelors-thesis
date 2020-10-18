@@ -37,6 +37,10 @@ Parameters::Parameters(const int argc, const char * const argv[]) {
             if (!utils::parse_unsigned_int(seed, val)) {
                 throw std::runtime_error("Invalid value for seed, expected positive number");
             }
+        } else if (opt == "arity") {
+            if (!utils::parse_int(arity, val) || arity < 1) {// || arity % 2 != 0) {
+                throw std::runtime_error("Invalid value for arity, expected positive number > 0");
+            }
         } else if (opt == "mutate") {
             if (!utils::parse_int(mutation, val) || mutation < 1) {
                 throw std::runtime_error("Invalid value for mutatation, expected number >= 1");
@@ -49,8 +53,8 @@ Parameters::Parameters(const int argc, const char * const argv[]) {
             if (!utils::parse_int(uniform_mutation, val) || uniform_mutation < 1) {
                 throw std::runtime_error("Invalid value for uniform mutation, expected number >= 1");
             }
-        } else if (opt == "literals") {
-            utils::parse_int(literal_count, val);
+        } else if (opt == "terms") {
+            utils::parse_int(term_count, val);
         } else if (opt == "crossover") {
             if (val != "true" && val != "false") {
                 throw std::runtime_error("Invalid value for crossover-random, expected true or false");
@@ -78,10 +82,10 @@ void Parameters::print_help() {
 
 void Parameters::is_valid(const ReferenceBits &reference_bits) {
     int input_size = reference_bits.input.size();
-    if (literal_count == 0) {
-        literal_count = input_size;
+    if (term_count == 0) {
+        term_count = input_size;
     }
-    if (literal_count < input_size) {
+    if (term_count < input_size) {
         throw std::runtime_error("Invalid value for literals, expected number >= " + std::to_string(input_size));
     }
 }

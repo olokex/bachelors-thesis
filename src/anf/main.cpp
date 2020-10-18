@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include "parameters.hpp"
-#include "cell.hpp"
 #include "state.hpp"
 #include "literal.hpp"
 #include "circuit.hpp"
@@ -14,7 +13,7 @@ void evolution(const Parameters &p, const ReferenceBits &ref) {
     std::vector<Circuit> population;
 
     for (int i = 0; i < p.lambda + 1; i++) {
-        Circuit c(p.literal_count, ref);
+        Circuit c(p, ref);
         population.push_back(c);
     }
     Circuit fittest = utils::get_fittest_invidiual(population);
@@ -23,11 +22,13 @@ void evolution(const Parameters &p, const ReferenceBits &ref) {
     for (unsigned int gen = 0; gen < p.generations; gen++) {
         for (int i = 0; i < p.lambda; i++) {
             population[i] = fittest;
-            population[i].mutate_overall(p.mutation, ref);
+            //population[i].mutate_in_row(p.mutation, ref);
+            //population[i].mutate_uniform(ref, p.mutation);
+            
             //population[i].mutate_in_row(p.mutation_row, ref);
             //population[i].mutate_uniform(ref, p.uniform_mutation);
-            //population[i].mutate_overall(p.mutation, ref);
             //population[i].crossover(fittest);
+            population[i].mutate_overall(p, ref);
             population[i].calculate_fitness(p, ref);
             if (population[i].fitness == 0) {
                 population[i].print_circuit(ref.input.size(), p.print_ascii);

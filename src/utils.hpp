@@ -29,7 +29,7 @@ namespace utils {
     template<class T>
     inline T &get_fittest_invidiual(std::vector<T> &population) {
         T *best = &population.at(0);
-        for (unsigned int i = 1; i < population.size(); i++) {
+        for (size_t i = 1; i < population.size(); i++) {
             if (population[i].fitness <= best->fitness) {
                 best = &population[i];
             }

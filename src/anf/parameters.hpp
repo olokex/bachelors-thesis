@@ -5,8 +5,9 @@
 
 class Parameters {
 public:
+    int arity = 2;
     int lambda = 4;
-    int literal_count = 0;
+    int term_count = 0;
     int mutation = 2;
     int mutation_row = 3;
     int uniform_mutation = 1;

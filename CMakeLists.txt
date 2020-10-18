@@ -34,10 +34,10 @@ add_executable(anf
     src/anf/main.cpp
     src/anf/parameters.hpp
     src/anf/parameters.cpp
-    src/anf/cell.hpp
     src/anf/state.hpp
     src/anf/literal.hpp
-    src/anf/literal.cpp
+    src/anf/formula.hpp
+    src/anf/formula.cpp
     src/anf/circuit.hpp
     src/anf/circuit.cpp
     src/reference_bits.hpp
