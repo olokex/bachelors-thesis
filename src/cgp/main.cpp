@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <iomanip>
+#include <chrono>
 #include "../reference_bits.hpp"
 #include "../utils.hpp"
 #include "function.hpp"
@@ -46,6 +47,9 @@ void evolution(const Parameters &param, const ReferenceBits &reference_bits) {
                 if (param.print_used_gates) {
                     population[i].print_used_gates(reference_bits.input.size(), param.allowed_functions);
                 }
+                if (param.print_used_area) {
+                    population[i].print_used_area(reference_bits.input.size(), param.allowed_functions);
+                }
                 return;
             }
         }
@@ -59,6 +63,7 @@ void evolution(const Parameters &param, const ReferenceBits &reference_bits) {
     }
 
     std::cout << "NOT FOUND" << std::endl;
+    std::cout << "best fitness: " << fittest.fitness << std::endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -73,7 +78,11 @@ int main(int argc, char *argv[]) {
 
         Parameters params(argc, argv);
         ReferenceBits reference_bits(params.path);
+        auto start = std::chrono::steady_clock::now();
         evolution(params, reference_bits);
+        auto end = std::chrono::steady_clock::now();
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        std::cout << "time: " << elapsed_time.count() << std::endl;
     } catch (const std::runtime_error &err) {
         std::cerr << "ERROR: " << err.what() << std::endl;
         return 1;

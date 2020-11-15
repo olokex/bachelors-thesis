@@ -65,6 +65,11 @@ Parameters::Parameters(const int argc, const char * const argv[]) {
                 throw std::runtime_error("Invalid value for print-used-gates, expected true or false");
             }
             print_used_gates = (val == "true");
+        } else if (opt == "print-used-area") {
+            if (val != "true" && val != "false") {
+                throw std::runtime_error("Invalid value for print-used-area, expected true or false");
+            }
+            print_used_area = (val == "true");
         } else if (opt == "print-ascii") {
             if (val != "true" && val != "false") {
                 throw std::runtime_error("Invalid value for print-ascii, expected true or false");
@@ -86,6 +91,6 @@ void Parameters::is_valid(const ReferenceBits &reference_bits) {
         term_count = input_size;
     }
     if (term_count < input_size) {
-        throw std::runtime_error("Invalid value for literals, expected number >= " + std::to_string(input_size));
+        throw std::runtime_error("Invalid value for terms, expected number >= " + std::to_string(input_size));
     }
 }

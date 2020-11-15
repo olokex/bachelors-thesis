@@ -129,7 +129,39 @@ void Circuit::print_used_gates(const int inputs_count, const std::vector<Functio
     }
 }
 
-
+void Circuit::print_used_area(const int inputs_count, const std::vector<Function> &allowed) {
+    this->inputs_count = inputs_count;
+    find_used_gates();
+    double area = 0;
+    for (auto &fun : allowed) {
+        int cnt = 0;
+        cnt = count_gates_within_function(fun);
+        switch (fun) {
+            case Function::Not:
+                area += cnt * 1.40;
+                break;
+            case Function::And:
+                area += cnt * 2.34;
+                break;
+            case Function::Or:
+                area += cnt * 2.34;
+                break;
+            case Function::Xor:
+                area += cnt * 4.69;
+                break;
+            case Function::Nand:
+                area += cnt * 1.87;
+                break;
+            case Function::Nor:
+                area += cnt * 2.34;
+                break;
+            case Function::Xnor:
+                area += cnt * 4.69;
+                break;
+        }
+    }
+    std::cout << "area: " << area << std::endl;
+}
 
 void Circuit::push_inputs(const ReferenceBits &reference_bits) {
     for (auto input : reference_bits.input) {
@@ -191,7 +223,7 @@ int Circuit::depth(const int idx) {
         return 0 + depth(cells[idx].input1);
     }
 
-    if (cells[idx].function == Function::Not){
+    if (cells[idx].function == Function::Not) {
         return 1 + depth(cells[idx].input1);
     }
 

@@ -67,6 +67,11 @@ Parameters::Parameters(const int argc, const char * const argv[]) {
                 throw std::runtime_error("Invalid value for print-used-gates, expected true or false");
             }
             print_used_gates = (val == "true");
+        } else if (opt == "print-used-area") {
+            if (val != "true" && val != "false") {
+                throw std::runtime_error("Invalid value for print-used-area, expected true or false");
+            }
+            print_used_area = (val == "true");
         } else if (opt == "functions") {
             parse_function_list(val);
         } else {

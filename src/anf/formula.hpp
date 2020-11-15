@@ -10,7 +10,7 @@ public:
     unsigned int fitness = UINT_MAX;
     int gate_and_count = 0;
     int gate_not_count = 0;
-    int gates_unused = 0;
+    //int gates_unused = 0;
     int gate_xor_count = 0;
 
     Formula(const int term_count, const int arity, const ReferenceBits &reference_bits);
@@ -22,9 +22,11 @@ public:
     void used_gates_count(const int inputs_count);
     void uniform_mutation(const ReferenceBits &reference_bits, const int chance);
 
-private:
-    std::vector<Literal> literals;
+    void calculate_fitness_new(const ReferenceBits &reference_bits, const int idx_out);
     std::vector<std::vector<int>> non_zeros;
+    std::vector<Literal> literals;
+
+private:
     Bitset evaluate_term(const int bits_count, const int input_count, const int start);
     int count_state(const int term, const int inputs_count, State s);
 };

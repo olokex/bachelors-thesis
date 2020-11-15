@@ -14,11 +14,13 @@ public:
     void calculate_fitness(const Parameters &param, const ReferenceBits &reference_bits);
     
     void print_used_gates(const int inputs_count);
+    void print_used_area(const int inputs_count);
 
     void mutate_overall(const Parameters &parameters, const ReferenceBits &reference_bits);
     void mutate_in_row(const int mutate, const ReferenceBits &reference_bits);
     void mutate_uniform(const ReferenceBits &reference_bits, const int uniform_mutate);
-    void crossover(const Circuit &c);
+
+    static Circuit crossover(Circuit parent1, Circuit parent2);
 
 private:
     std::vector<Formula> formulas;

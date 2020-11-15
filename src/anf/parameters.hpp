@@ -8,7 +8,7 @@ public:
     int arity = 2;
     int lambda = 4;
     int term_count = 0;
-    int mutation = 2;
+    int mutation = 1;
     int mutation_row = 3;
     int uniform_mutation = 1;
     bool crossover = false;
@@ -17,6 +17,7 @@ public:
     std::string path;
     bool print_fitness = false;
     bool print_used_gates = false;
+    bool print_used_area = false;
     bool print_ascii = false;
     int print_count = 100'000;
 

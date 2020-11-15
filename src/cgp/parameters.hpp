@@ -28,6 +28,7 @@ public:
     std::string path;
     bool print_fitness = false;
     bool print_used_gates = false;
+    bool print_used_area = false;
     int print_count = 100'000;
 
     Parameters();
