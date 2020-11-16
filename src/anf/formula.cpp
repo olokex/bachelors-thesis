@@ -9,6 +9,32 @@
 Formula::Formula(const int term_count, const int arity, const ReferenceBits &reference_bits) {
     non_zeros.resize(term_count);
     int cnt = 0;
+/*
+    for (int term = 0; term < term_count; term++) {
+        bool set = false;
+        for (int i = 0; i < reference_bits.input.size(); i++) {
+            Literal l;
+            l.value = reference_bits.input[i];
+            if (term % 2 == 0 && set == false) {
+                l.state = State::Is;
+                set = true;
+            } else {
+                l.state = State::IsNot;
+            }
+            
+            literals.push_back(l);
+        }
+        set = false;
+    }
+
+    for (int term = 0; term < term_count; term++) {
+        for (int i = 0; i < reference_bits.input.size(); i++) {
+            Literal l;
+            l.value = reference_bits.input[i];
+            l.state = State::IsNot;
+            literals.push_back(l);
+        }
+    }
 
 /*
     for (int term = 0; term < term_count; term++) {
@@ -18,7 +44,6 @@ Formula::Formula(const int term_count, const int arity, const ReferenceBits &ref
                 l.state = State::Is;
                 l.value = reference_bits.input[i];
                 non_zeros[term].push_back(cnt);
-                std::cout << "tady" << std::endl;
             } else if (i == term && i != 4) {
                 l.state = State::Is;
                 l.value = reference_bits.input[i];
@@ -70,9 +95,10 @@ void Formula::calculate_fitness_new(const ReferenceBits &reference_bits, const i
     int shift = 0;
     for (int i = 0; i < non_zeros.size(); i++) {
         if (non_zeros[i].size() != 0) {
-            shift = i;
+            // shift = i;
             break;
         }
+        shift++;
     }
     //std::cout << "shift 1 :" << shift << std::endl;
     // Bitset out = literals[non_zeros[shift][0]].value;
@@ -87,13 +113,22 @@ void Formula::calculate_fitness_new(const ReferenceBits &reference_bits, const i
         return term_out;
     };
     
+    if (shift == non_zeros.size()) {
+        // fitness = UINT16_MAX;
+        Bitset tmp(reference_bits.input[0].size(), 0);
+        tmp = tmp ^ reference_bits.output[idx_out];
+        fitness = tmp.count();
+        // std::cout << non_zeros.size() << " shift " << shift << std::endl;
+        return;
+    }
+
     Bitset out = evaluate_term();
     // Bitset out(refence_bits.input[0].size());
     // TODO theoretical segfault if whole formula is empty - isnot states => almost impossible?
     for (shift = shift + 1; shift < non_zeros.size(); shift++) {
         if (non_zeros[shift].size() == 0) continue;
         out = out ^ evaluate_term();
-        //std::cout << "inside: " << i << std::endl;
+        // std::cout << "inside: " << shift << std::endl;
     }
 
     // std::cout << "out bef: " << out << std::endl;
@@ -148,14 +183,14 @@ void Formula::print_circuit(const int inputs_count) {
         cnt++;
     }
     std::cout << "\033[0m" << std::endl;
-
+/*
     for (auto &x : non_zeros) {
         for (auto &t : x) {
             std::cout << t << " || ";
         }
         std::cout << std::endl;
     }
-
+*/
 }
 
 void Formula::print_circuit_ascii_only(const int inputs_count) {
@@ -211,7 +246,7 @@ void Formula::mutate(const Parameters &p, const ReferenceBits &reference_bits) {
         literals[idx_literal].state = new_state;
     }
 
-    if (new_state == State::Is) {
+    else if (new_state == State::Is) {
         if (non_zeros[idx_term].size() == p.arity) { // odstrani z nonzeros
             auto &vec = non_zeros[idx_term];
             auto it = std::find(vec.begin(), vec.end(), idx_literal);
@@ -233,7 +268,7 @@ void Formula::mutate(const Parameters &p, const ReferenceBits &reference_bits) {
         }
     }
 
-    if (new_state == State::Not) {
+    else if (new_state == State::Not) {
         if (non_zeros[idx_term].size() == p.arity) { // odstrani z nonzeros
             auto &vec = non_zeros[idx_term];
             auto it = std::find(vec.begin(), vec.end(), idx_literal);

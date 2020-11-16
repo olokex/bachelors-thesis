@@ -157,12 +157,15 @@ Circuit Circuit::crossover(Circuit parent1, Circuit parent2) {
         int shift = cross_point * inputs_count;
         // std::cout << "shift: " << shift << std::endl; 
         
-        // for (int lit = shift; lit < size; lit++) {
-        //     offspring.formulas[i].literals[lit] = parent2.formulas[i].literals[lit];
-        // }
+        for (int lit = shift; lit < size; lit++) {
+            offspring.formulas[i].literals[lit] = parent2.formulas[i].literals[lit];
+        }
         for (int idx = cross_point; idx < nonzerossize; idx++) {
-            offspring.formulas.at(i).non_zeros.at(idx) = parent2.formulas.at(i).non_zeros.at(idx);
-            // offspring.formulas[i].non_zeros[idx] = parent2.formulas[i].non_zeros[idx];
+            // for (int a = 0; a < offspring.formulas[i].non_zeros[idx].size(); a++) {
+            //     offspring.formulas[i].non_zeros[idx][a] = parent2.formulas[i].non_zeros[idx][a];
+            // }
+            //offspring.formulas.at(i).non_zeros.at(idx) = parent2.formulas.at(i).non_zeros.at(idx);
+            offspring.formulas[i].non_zeros[idx] = parent2.formulas[i].non_zeros[idx];
         }
     }
     return offspring;

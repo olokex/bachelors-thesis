@@ -49,17 +49,17 @@ void evolution(const Parameters &p, const ReferenceBits &ref) {
         }
         if (gen % p.print_count == 0 && p.print_fitness) {
             std::cout << "generation: " << gen << " best fitness: " << fittest.fitness << std::endl;
-            //fittest.print_circuit(ref.input.size(), false);
+            fittest.print_circuit(ref.input.size(), false);
         }
-        for (int i = 0; i < 3; i++) {
-            int idx1 = utils::randint(0, p.lambda);
-            int idx2 = utils::randint(0, p.lambda);
-            Circuit c = Circuit::crossover(population[idx1], population[idx2]);
-            c.calculate_fitness(p, ref);
-            if (c.fitness <= fittest.fitness) {
-                fittest = c;
-            }
-        }
+        // for (int i = 0; i < 3; i++) {
+        //     int idx1 = utils::randint(0, p.lambda);
+        //     int idx2 = utils::randint(0, p.lambda);
+        //     Circuit c = Circuit::crossover(population[idx1], population[idx2]);
+        //     c.calculate_fitness(p, ref);
+        //     if (c.fitness <= fittest.fitness) {
+        //         fittest = c;
+        //     }
+        // }
     }
     std::cout << "NOT FOUND" << std::endl;
 }
