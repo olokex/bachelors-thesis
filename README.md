@@ -11,7 +11,7 @@ Code requires:
 In order to compile the application you only have to run `make` that will make `./build` with binaries.
 
 ## Usage
-Path argument desires file in truth table notation for futher comprehension investigate the `./data` directory.
+Path argument requires file in truth table notation. For futher comprehension, investigate the `./data` directory.
 #### CGP:
 ```
 ./build/cgp path ./data/parity5.txt
@@ -23,7 +23,8 @@ Path argument desires file in truth table notation for futher comprehension inve
 ```
 
 ### Parameters
-Order of parameter doesn't matter, duplicity is allowed i.e. last switch is used.
+In case of parameter duplicity, the last value is used. The order of the parameters doesn't matter.
+
 **Common**
 option          | expected value
 ----------------|---------------
@@ -53,6 +54,6 @@ arity       | >= 1
 print-ascii | true/false
 
 ### Get in touch
-Don't hesitate to contact me, if anything unclear, or not working.
+Don't hesitate to contact me, if anything unclear, or not working. <br>
 [VUT e-mail](mailto:xsedla1e@fit.vutbr.cz) <br>
 [olokex@gmail.com](mailto:olokex@gmail.com) (personal and preffered)
