@@ -20,7 +20,6 @@ public:
     void print_bits(const int term_count, const int inputs_count);
     void mutate(const Parameters &parameters, const ReferenceBits &reference_bits);
     void used_gates_count(const int inputs_count);
-    void uniform_mutation(const ReferenceBits &reference_bits, const int chance);
 
     void calculate_fitness_new(const ReferenceBits &reference_bits, const int idx_out);
     std::vector<std::vector<int>> non_zeros;

@@ -8,10 +8,7 @@ public:
     int arity = 2;
     int lambda = 4;
     int term_count = 0;
-    int mutation = 1;
-    int mutation_row = 3;
-    int uniform_mutation = 1;
-    bool crossover = false;
+    int mutation = 2;
     unsigned int generations = 5'000'000;
     unsigned int seed = time(nullptr);
     std::string path;

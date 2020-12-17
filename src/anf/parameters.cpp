@@ -45,21 +45,13 @@ Parameters::Parameters(const int argc, const char * const argv[]) {
             if (!utils::parse_int(mutation, val) || mutation < 1) {
                 throw std::runtime_error("Invalid value for mutatation, expected number >= 1");
             }
-        } else if (opt == "mutate-row") {
-            if (!utils::parse_int(mutation_row, val) || mutation_row < 1) {
-                throw std::runtime_error("Invalid value for mutatation-row, expected number >= 1");
-            }
-        } else if (opt == "uniform-mutate") {
-            if (!utils::parse_int(uniform_mutation, val) || uniform_mutation < 1) {
-                throw std::runtime_error("Invalid value for uniform mutation, expected number >= 1");
-            }
         } else if (opt == "terms") {
             utils::parse_int(term_count, val);
-        } else if (opt == "crossover") {
-            if (val != "true" && val != "false") {
-                throw std::runtime_error("Invalid value for crossover-random, expected true or false");
-            }
-            crossover = (val == "true");
+        // } else if (opt == "crossover") {
+        //     if (val != "true" && val != "false") {
+        //         throw std::runtime_error("Invalid value for crossover-random, expected true or false");
+        //     }
+        //     crossover = (val == "true");
         } else if (opt == "print-used-gates") {
             if (val != "true" && val != "false") {
                 throw std::runtime_error("Invalid value for print-used-gates, expected true or false");
@@ -90,7 +82,7 @@ void Parameters::is_valid(const ReferenceBits &reference_bits) {
     if (term_count == 0) {
         term_count = input_size;
     }
-    if (term_count < input_size) {
-        throw std::runtime_error("Invalid value for terms, expected number >= " + std::to_string(input_size));
-    }
+    // if (term_count < input_size) {
+    //     throw std::runtime_error("Invalid value for terms, expected number >= " + std::to_string(input_size));
+    // }
 }

@@ -9,55 +9,6 @@
 Formula::Formula(const int term_count, const int arity, const ReferenceBits &reference_bits) {
     non_zeros.resize(term_count);
     int cnt = 0;
-/*
-    for (int term = 0; term < term_count; term++) {
-        bool set = false;
-        for (int i = 0; i < reference_bits.input.size(); i++) {
-            Literal l;
-            l.value = reference_bits.input[i];
-            if (term % 2 == 0 && set == false) {
-                l.state = State::Is;
-                set = true;
-            } else {
-                l.state = State::IsNot;
-            }
-            
-            literals.push_back(l);
-        }
-        set = false;
-    }
-
-    for (int term = 0; term < term_count; term++) {
-        for (int i = 0; i < reference_bits.input.size(); i++) {
-            Literal l;
-            l.value = reference_bits.input[i];
-            l.state = State::IsNot;
-            literals.push_back(l);
-        }
-    }
-
-/*
-    for (int term = 0; term < term_count; term++) {
-        for (int i = 0; i < reference_bits.input.size(); i++) {
-            Literal l;
-            if (term == 5 && i == 4) {
-                l.state = State::Is;
-                l.value = reference_bits.input[i];
-                non_zeros[term].push_back(cnt);
-            } else if (i == term && i != 4) {
-                l.state = State::Is;
-                l.value = reference_bits.input[i];
-                non_zeros[term].push_back(cnt);
-            } else {
-                l.state = State::IsNot;
-                l.value = ~reference_bits.input[i];
-            }
-            literals.push_back(l);
-            cnt++;
-        }
-    }
-*/
-
 
     for (int term = 0; term < term_count; term++) {
         for (size_t i = 0; i < reference_bits.input.size(); i++) {
@@ -81,59 +32,41 @@ Formula::Formula(const int term_count, const int arity, const ReferenceBits &ref
             literals.push_back(l);
         }
     }
-/*
-    for (auto &t : non_zeros) {
-        for (auto &x : t) {
-            std::cout << x << " || ";
-        }
-    }
-    std::cout << std::endl;
-*/
 }
 
 void Formula::calculate_fitness_new(const ReferenceBits &reference_bits, const int idx_out) {
     int shift = 0;
     for (int i = 0; i < non_zeros.size(); i++) {
         if (non_zeros[i].size() != 0) {
-            // shift = i;
             break;
         }
         shift++;
     }
-    //std::cout << "shift 1 :" << shift << std::endl;
-    // Bitset out = literals[non_zeros[shift][0]].value;
 
     auto evaluate_term = [&]() {
-        //std::cout << "fun: " << static_cast<int>(literals[non_zeros[shift][0]].state) << std::endl;
         Bitset term_out = literals[non_zeros[shift][0]].value;
         for (int i = 1; i < non_zeros[shift].size(); i++) {
             term_out &= literals[non_zeros[shift][i]].value;
         }
-        //std::cout << "shift: " << shift << std::endl;
         return term_out;
     };
     
     if (shift == non_zeros.size()) {
-        // fitness = UINT16_MAX;
+        // fitness = UINT16_MAX; // can cause overflow -> perfect fitness
         Bitset tmp(reference_bits.input[0].size(), 0);
+        // tmp = tmp | reference_bits.output[idx_out]; // DNF
         tmp = tmp ^ reference_bits.output[idx_out];
         fitness = tmp.count();
-        // std::cout << non_zeros.size() << " shift " << shift << std::endl;
         return;
     }
 
     Bitset out = evaluate_term();
-    // Bitset out(refence_bits.input[0].size());
-    // TODO theoretical segfault if whole formula is empty - isnot states => almost impossible?
     for (shift = shift + 1; shift < non_zeros.size(); shift++) {
         if (non_zeros[shift].size() == 0) continue;
         out = out ^ evaluate_term();
-        // std::cout << "inside: " << shift << std::endl;
     }
 
-    // std::cout << "out bef: " << out << std::endl;
     out = out ^ reference_bits.output[idx_out];
-    // std::cout << "out af: " << out << std::endl;
     fitness = out.count();
 }
 
@@ -144,9 +77,7 @@ void Formula::calculate_fitness(const int term_count, const ReferenceBits &refer
     for (int i = 1; i < term_count; i++) {
         out = out ^ evaluate_term(bits_count, inputs_count, inputs_count * i);
     }
-    // std::cout << "out bef: " << out << std::endl;
     out = out ^ reference_bits.output[idx_out];
-    // std::cout << "out af: " << out << std::endl;
     fitness = out.count();
 }
 
@@ -183,14 +114,6 @@ void Formula::print_circuit(const int inputs_count) {
         cnt++;
     }
     std::cout << "\033[0m" << std::endl;
-/*
-    for (auto &x : non_zeros) {
-        for (auto &t : x) {
-            std::cout << t << " || ";
-        }
-        std::cout << std::endl;
-    }
-*/
 }
 
 void Formula::print_circuit_ascii_only(const int inputs_count) {
@@ -229,10 +152,6 @@ void Formula::print_bits(const int term_count, const int inputs_count) {
 void Formula::mutate(const Parameters &p, const ReferenceBits &reference_bits) {
     int idx_literal = utils::randint(0, literals.size());     // vygenerování IDX literalu co se má změnit
     int idx_term = idx_literal / reference_bits.input.size(); // zjištění pozice termu
-
-    // std::cout << "size ref" << reference_bits.input.size() << std::endl;
-
-    // std::cout << "lit i: " << idx_literal << " term i: " << idx_term << std::endl;
     State new_state = State(utils::randint(0, 3)); // vygenerování nového stavu
 
     if (new_state == State::IsNot) {
@@ -287,100 +206,6 @@ void Formula::mutate(const Parameters &p, const ReferenceBits &reference_bits) {
         auto it = std::find(vec.begin(), vec.end(), idx_literal);
         if (it == vec.end()) {
             vec.push_back(idx_literal);
-        }
-    }
-
-
-/*
-    if (non_zeros[idx_term].size() == p.arity) {
-        // std::cout << "tady " << non_zeros.size() << std::endl;
-        auto &vec = non_zeros[idx_term];
-        auto it = std::find(vec.begin(), vec.end(), idx_literal);
-        if (it == vec.end()) {
-            std::cout << "nenasel" << std::endl;
-            if (vec.size() != 0) {
-                int i = utils::randint(0, vec.size());
-                literals[non_zeros[idx_term][i]].state = State::IsNot;
-                vec.erase(vec.begin() + i);
-                std::cout << "i: " << i << std::endl;
-            }
-        } else {
-            std::cout << "nasel" << std::endl;
-            // std::cout << "lit i: " << idx_literal << " term i: " << idx_term << std::endl;
-            vec.erase(it);
-            literals[idx_literal].state = State::IsNot;
-        }
-    }
-
-
-    literals[idx_literal].state = new_state;
-    if (new_state != State::IsNot) {
-        int idx_input = idx_literal % reference_bits.input.size();
-        if (new_state == State::Not) {
-            std::cout << "po" << std::endl;
-           literals[idx_literal].value = ~reference_bits.input[idx_input];
-        } else {
-            std::cout << "pred" << std::endl;
-            literals[idx_literal].value = reference_bits.input[idx_input];
-        }
-        non_zeros[idx_term].push_back(idx_literal);
-        std::cout << "pridano" << std::endl;
-    }
-    
-    std::cout << "new state: " << static_cast<int>(new_state) << std::endl;
-    
-    // if (non_zeros[idx_term].size()  p.arity) {
-    //     // if (utils::is_in_vector(non_zeros[idx_term], idx_literal)) {
-    //     //     non_zeros[idx_term].erase(std::find(non_zeros[idx_term].begin(), non_zeros[idx_term].end(), idx_literal));
-    //     // }
-    //     std::cout << "tady" << std::endl;
-    // }
-/*
-    int idx_cell = utils::randint(0, literals.size());
-    //std::cout << "idx " << idx_cell << " ";
-    // literals[idx_cell].state = State::Not;
-    //std::cout << "term cnt: " << p.term_count << std::endl;
-    int term_position = idx_cell / reference_bits.input.size();
-    //std::cout << " pos : " << term_position << " ";
-
-    if (non_zeros[term_position].size() >= p.arity) {
-        int i = utils::randint(0, non_zeros[term_position].size());
-        
-        literals[non_zeros[term_position][i]].state = State::IsNot;
-        non_zeros[term_position].erase(non_zeros[term_position].begin() + i);
-    }
-
-    State new_state = State(utils::randint(0, 3));
-    int input = idx_cell % reference_bits.input.size();
-    if (new_state == State::Is) {
-        literals[idx_cell].value = reference_bits.input[input];
-        if (!utils::is_in_vector(non_zeros[term_position], idx_cell)) {
-            non_zeros[term_position].push_back(idx_cell);
-        }
-        literals[idx_cell].state = new_state;
-    } else if (new_state == State::Not) {
-        literals[idx_cell].value = ~reference_bits.input[input];
-        if (!utils::is_in_vector(non_zeros[term_position], idx_cell)) {
-            non_zeros[term_position].push_back(idx_cell);
-        }
-        literals[idx_cell].state = new_state;
-    }
-*/
-}
-
-void Formula::uniform_mutation(const ReferenceBits &reference_bits, const int chance) {
-    for (size_t i = 0; i < literals.size(); i++) {
-        if (utils::randint(0, 100) < chance) {
-            State new_state = State(utils::randint(0, 3));
-            if (literals[i].state == new_state) continue;
-
-            int input = i % reference_bits.input.size();
-            if (new_state == State::Is) {
-                literals[i].value = reference_bits.input[input];
-            } else if (new_state == State::Not) {
-                literals[i].value = ~reference_bits.input[input];
-            }
-            literals[i].state = new_state;
         }
     }
 }
