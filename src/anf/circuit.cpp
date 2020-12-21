@@ -68,7 +68,7 @@ void Circuit::print_circuit(const int inputs_count, const bool print_ascii) {
     }
 }
 
-void Circuit::calculate_fitness(const Parameters &param, const ReferenceBits &reference_bits) {
+void Circuit::calculate_fitness(const ReferenceBits &reference_bits) {
     uint tmp_fit = 0;
     for (size_t i = 0; i < formulas.size(); i++) {
         // formulas[i].calculate_fitness_new(reference_bits, i);
@@ -89,17 +89,17 @@ Circuit Circuit::crossover(Circuit parent1, Circuit parent2) {
     // int cross_point = utils::randint(1, nonzerossize);
     // int shift = cross_point * inputs_count;
 
-    for (int i = 0; i < offspring.formulas.size(); i++) {
+    for (size_t i = 0; i < offspring.formulas.size(); i++) {
         auto size = offspring.formulas[i].literals.size();
         auto nonzerossize = offspring.formulas[i].non_zeros.size();
         int inputs_count = size / nonzerossize;
         int cross_point = utils::randint(1, nonzerossize);
         int shift = cross_point * inputs_count;
         
-        for (int lit = shift; lit < size; lit++) {
+        for (size_t lit = shift; lit < size; lit++) {
             offspring.formulas[i].literals[lit] = parent2.formulas[i].literals[lit];
         }
-        for (int idx = cross_point; idx < nonzerossize; idx++) {
+        for (size_t idx = cross_point; idx < nonzerossize; idx++) {
             offspring.formulas[i].non_zeros[idx] = parent2.formulas[i].non_zeros[idx];
         }
     }

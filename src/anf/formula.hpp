@@ -13,7 +13,7 @@ public:
     //int gates_unused = 0;
     int gate_xor_count = 0;
 
-    Formula(const int term_count, const int arity, const ReferenceBits &reference_bits);
+    Formula(const int term_count, const unsigned int arity, const ReferenceBits &reference_bits);
     void print_circuit(const int inputs_count);
     void print_circuit_ascii_only(const int inputs_count);
     void print_bits(const int term_count, const int inputs_count);

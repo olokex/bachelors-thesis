@@ -6,14 +6,14 @@
 #include <vector>
 #include <iostream>
 
-Formula::Formula(const int term_count, const int arity, const ReferenceBits &reference_bits) {
+Formula::Formula(const int term_count, const unsigned int arity, const ReferenceBits &reference_bits) {
     non_zeros.resize(term_count);
     int cnt = 0;
 
     for (int term = 0; term < term_count; term++) {
         for (size_t i = 0; i < reference_bits.input.size(); i++) {
             Literal l;
-            if (non_zeros[term].size() >= arity) {
+            if (static_cast<uint>(non_zeros[term].size()) >= arity) {
                 l.state = State::IsNot;
                 l.value = reference_bits.input[i];
             } else {
@@ -35,8 +35,8 @@ Formula::Formula(const int term_count, const int arity, const ReferenceBits &ref
 }
 
 void Formula::calculate_fitness(const ReferenceBits &reference_bits, const int idx_out) {
-    int shift = 0;
-    for (int i = 0; i < non_zeros.size(); i++) {
+    size_t shift = 0;
+    for (size_t i = 0; i < non_zeros.size(); i++) {
         if (non_zeros[i].size() != 0) {
             break;
         }
@@ -45,7 +45,7 @@ void Formula::calculate_fitness(const ReferenceBits &reference_bits, const int i
 
     auto evaluate_term = [&]() {
         Bitset term_out = literals[non_zeros[shift][0]].value;
-        for (int i = 1; i < non_zeros[shift].size(); i++) {
+        for (size_t i = 1; i < non_zeros[shift].size(); i++) {
             term_out &= literals[non_zeros[shift][i]].value;
         }
         return term_out;
@@ -89,10 +89,10 @@ void Formula::print_circuit(const int inputs_count) {
 }
 
 void Formula::print_circuit_ascii_only(const int inputs_count) {
-    int cnt = 0;
+    size_t cnt = 0;
     //std::cout << "[";
     for (auto &x : literals) {
-        int x_cnt = cnt % inputs_count;
+        // size_t x_cnt = cnt % inputs_count;
         //if (x_cnt == 0 && cnt != 0) std::cout << "] o [";
         if (x.state == State::Is) {
             std::cout << "1";

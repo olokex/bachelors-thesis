@@ -16,7 +16,7 @@ std::tuple<Circuit, uint> evolution(const Parameters &p, const ReferenceBits &re
 
     for (int i = 0; i < p.lambda + 1; i++) {
         Circuit c(p, ref);
-        c.calculate_fitness(p, ref);
+        c.calculate_fitness(ref);
         population.push_back(c);
     }
 
@@ -27,7 +27,7 @@ std::tuple<Circuit, uint> evolution(const Parameters &p, const ReferenceBits &re
         for (int i = 0; i < p.lambda; i++) {
             population[i] = fittest;
             population[i].mutate_overall(p, ref);
-            population[i].calculate_fitness(p, ref);
+            population[i].calculate_fitness(ref);
 
             if (population[i].fitness == 0) {
                 population[i].print_circuit(ref.input.size(), p.print_ascii);
