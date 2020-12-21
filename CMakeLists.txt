@@ -29,6 +29,7 @@ add_executable(cgp
     src/reference_bits.cpp
     src/utils.hpp
     src/utils.cpp
+    src/process_size.hpp
 )
 
 # add the executable
@@ -46,4 +47,5 @@ add_executable(anf
     src/reference_bits.cpp
     src/utils.hpp
     src/utils.cpp
+    src/process_size.hpp
 )

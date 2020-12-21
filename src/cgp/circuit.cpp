@@ -1,10 +1,11 @@
 #include <iostream>
 #include <cstdio>
 #include "parameters.hpp"
-#include "../utils.hpp"
-#include "../reference_bits.hpp"
 #include "cell.hpp"
 #include "circuit.hpp"
+#include "../utils.hpp"
+#include "../reference_bits.hpp"
+#include "../process_size.hpp"
 
 Circuit::Circuit(const Parameters &param, const ReferenceBits &reference_bits) {
     push_inputs(reference_bits);
@@ -129,7 +130,7 @@ void Circuit::print_used_gates(const int inputs_count, const std::vector<Functio
     }
 }
 
-void Circuit::print_used_area(const int inputs_count, const std::vector<Function> &allowed) {
+void Circuit::calculate_used_area(const int inputs_count, const std::vector<Function> &allowed) {
     this->inputs_count = inputs_count;
     find_used_gates();
     double area = 0;
@@ -138,29 +139,31 @@ void Circuit::print_used_area(const int inputs_count, const std::vector<Function
         cnt = count_gates_within_function(fun);
         switch (fun) {
             case Function::Not:
-                area += cnt * 1.40;
+                area += cnt * gate_size::Not;
                 break;
             case Function::And:
-                area += cnt * 2.34;
+                area += cnt * gate_size::And;
                 break;
             case Function::Or:
-                area += cnt * 2.34;
+                area += cnt * gate_size::Or;
                 break;
             case Function::Xor:
-                area += cnt * 4.69;
+                area += cnt * gate_size::Xor;
                 break;
             case Function::Nand:
-                area += cnt * 1.87;
+                area += cnt * gate_size::Nand;
                 break;
             case Function::Nor:
-                area += cnt * 2.34;
+                area += cnt * gate_size::Nor;
                 break;
             case Function::Xnor:
-                area += cnt * 4.69;
+                area += cnt * gate_size::Xnor;
+                break;
+            case Function::In:
                 break;
         }
     }
-    std::cout << "area: " << area << std::endl;
+    this->area = area;
 }
 
 void Circuit::push_inputs(const ReferenceBits &reference_bits) {

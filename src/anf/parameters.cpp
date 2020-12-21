@@ -38,7 +38,7 @@ Parameters::Parameters(const int argc, const char * const argv[]) {
                 throw std::runtime_error("Invalid value for seed, expected positive number");
             }
         } else if (opt == "arity") {
-            if (!utils::parse_int(arity, val) || arity < 1) {// || arity % 2 != 0) {
+            if (!utils::parse_unsigned_int(arity, val) || arity < 1) {// || arity % 2 != 0) {
                 throw std::runtime_error("Invalid value for arity, expected positive number > 0");
             }
         } else if (opt == "mutate") {

@@ -14,14 +14,13 @@ public:
     int gate_xor_count = 0;
 
     Formula(const int term_count, const int arity, const ReferenceBits &reference_bits);
-    void calculate_fitness(const int term_count, const ReferenceBits &reference_bits, const int idx_out);
     void print_circuit(const int inputs_count);
     void print_circuit_ascii_only(const int inputs_count);
     void print_bits(const int term_count, const int inputs_count);
     void mutate(const Parameters &parameters, const ReferenceBits &reference_bits);
     void used_gates_count(const int inputs_count);
 
-    void calculate_fitness_new(const ReferenceBits &reference_bits, const int idx_out);
+    void calculate_fitness(const ReferenceBits &reference_bits, const int idx_out);
     std::vector<std::vector<int>> non_zeros;
     std::vector<Literal> literals;
 

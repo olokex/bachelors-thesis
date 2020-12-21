@@ -5,7 +5,7 @@
 
 class Parameters {
 public:
-    int arity = 2;
+    unsigned int arity = 2;
     int lambda = 4;
     int term_count = 0;
     int mutation = 2;

@@ -1,10 +1,11 @@
 #include <vector>
 #include <iostream>
-#include "../reference_bits.hpp"
-#include "../utils.hpp"
 #include "parameters.hpp"
 #include "formula.hpp"
 #include "circuit.hpp"
+#include "../reference_bits.hpp"
+#include "../utils.hpp"
+#include "../process_size.hpp"
 
 Circuit::Circuit(const Parameters &parameters, const ReferenceBits &reference_bits) {
     for (size_t i = 0; i < reference_bits.output.size(); i++) {
@@ -40,7 +41,7 @@ void Circuit::print_used_gates(const int inputs_count) {
     std::cout << "not: " << gate_not_count << std::endl;
 }
 
-void Circuit::print_used_area(const int inputs_count) {
+void Circuit::calculate_used_area(const int inputs_count) {
     int gate_and_count = 0;
     int gate_not_count = 0;
     int gate_xor_count = 0;
@@ -50,8 +51,11 @@ void Circuit::print_used_area(const int inputs_count) {
         gate_xor_count += f.gate_xor_count;
         gate_not_count += f.gate_not_count;
     }
-    double area = gate_and_count * 2.34 + gate_xor_count * 4.69 + gate_not_count * 1.40;
-    std::cout << "area: " << area << std::endl;
+    double area = gate_and_count * gate_size::And
+                + gate_xor_count * gate_size::Xor
+                + gate_not_count * gate_size::Not;
+    // std::cout << "area: " << area << std::endl;
+    this->area = area;
 }
 
 void Circuit::print_circuit(const int inputs_count, const bool print_ascii) {
@@ -67,11 +71,11 @@ void Circuit::print_circuit(const int inputs_count, const bool print_ascii) {
 void Circuit::calculate_fitness(const Parameters &param, const ReferenceBits &reference_bits) {
     uint tmp_fit = 0;
     for (size_t i = 0; i < formulas.size(); i++) {
-        formulas[i].calculate_fitness_new(reference_bits, i);
+        // formulas[i].calculate_fitness_new(reference_bits, i);
+        formulas[i].calculate_fitness(reference_bits, i);
         tmp_fit += formulas[i].fitness;
     }
     fitness = tmp_fit;
-
 }
 
 Circuit Circuit::crossover(Circuit parent1, Circuit parent2) {

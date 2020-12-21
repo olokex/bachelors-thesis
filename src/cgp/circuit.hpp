@@ -10,6 +10,7 @@
 class Circuit {
 public:
     unsigned int fitness = UINT_MAX;
+    double area = MAXFLOAT;
 
     Circuit(const Parameters &param, const ReferenceBits &reference_bits);
     void print_circuit_cgpviewer(const Parameters &param, const ReferenceBits &reference_bits);
@@ -18,7 +19,7 @@ public:
     void mutate(const int mutation_rate, const std::vector<Function> &allowed_functions, const int inputs_count);
     void print_bits(const ReferenceBits &reference_bits);
     void print_used_gates(const int inputs_count, const std::vector<Function> &allowed);
-    void print_used_area(const int inputs_count, const std::vector<Function> &allowed);
+    void calculate_used_area(const int inputs_count, const std::vector<Function> &allowed);
 
 private:
     std::vector<Cell> cells;

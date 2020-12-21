@@ -34,7 +34,7 @@ Formula::Formula(const int term_count, const int arity, const ReferenceBits &ref
     }
 }
 
-void Formula::calculate_fitness_new(const ReferenceBits &reference_bits, const int idx_out) {
+void Formula::calculate_fitness(const ReferenceBits &reference_bits, const int idx_out) {
     int shift = 0;
     for (int i = 0; i < non_zeros.size(); i++) {
         if (non_zeros[i].size() != 0) {
@@ -68,34 +68,6 @@ void Formula::calculate_fitness_new(const ReferenceBits &reference_bits, const i
 
     out = out ^ reference_bits.output[idx_out];
     fitness = out.count();
-}
-
-void Formula::calculate_fitness(const int term_count, const ReferenceBits &reference_bits, const int idx_out) {
-    unsigned int inputs_count = reference_bits.input.size();
-    unsigned int bits_count = reference_bits.input[0].size();
-    Bitset out = evaluate_term(bits_count, inputs_count, 0);
-    for (int i = 1; i < term_count; i++) {
-        out = out ^ evaluate_term(bits_count, inputs_count, inputs_count * i);
-    }
-    out = out ^ reference_bits.output[idx_out];
-    fitness = out.count();
-}
-
-Bitset Formula::evaluate_term(const int bits_count, const int input_count, const int start) {
-    Bitset out(bits_count, 0);
-    int shift = 0;
-    for (; shift < input_count; shift++) {
-        if (literals[start + shift].state != State::IsNot) {
-            out = literals[start + shift].value;
-            break;
-        }
-    }
-    for (int i = shift + 1; i < input_count; i++) {
-        if (literals[start + i].state != State::IsNot) {
-            out &= literals[start + i].value;
-        }
-    }
-    return out;
 }
 
 void Formula::print_circuit(const int inputs_count) {

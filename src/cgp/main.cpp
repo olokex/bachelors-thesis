@@ -1,17 +1,4 @@
 #include <iostream>
-#include <map>
-#include <boost/dynamic_bitset.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#include <fstream>
-#include <cstdio>
-#include <ctime>
-#include <cstdlib>
-#include <string>
-#include <exception>
-#include <stdexcept>
-#include <algorithm>
-#include <iomanip>
 #include <chrono>
 #include "../reference_bits.hpp"
 #include "../utils.hpp"
@@ -48,7 +35,8 @@ void evolution(const Parameters &param, const ReferenceBits &reference_bits) {
                     population[i].print_used_gates(reference_bits.input.size(), param.allowed_functions);
                 }
                 if (param.print_used_area) {
-                    population[i].print_used_area(reference_bits.input.size(), param.allowed_functions);
+                    population[i].calculate_used_area(reference_bits.input.size(), param.allowed_functions);
+                    std::cout << "area: " << population[i].area << std::endl;
                 }
                 return;
             }

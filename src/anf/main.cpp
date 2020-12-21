@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <chrono>
 #include "parameters.hpp"
 #include "state.hpp"
@@ -7,9 +6,10 @@
 #include "circuit.hpp"
 #include "../reference_bits.hpp"
 #include "../utils.hpp"
+#include <tuple>
 
 
-void evolution(const Parameters &p, const ReferenceBits &ref) {
+std::tuple<Circuit, uint> evolution(const Parameters &p, const ReferenceBits &ref) {
     srand(p.seed);
     std::cout << "seed: " << p.seed << std::endl;
     std::vector<Circuit> population;
@@ -36,9 +36,10 @@ void evolution(const Parameters &p, const ReferenceBits &ref) {
                     population[i].print_used_gates(ref.input.size());
                 }
                 if (p.print_used_area) {
-                    population[i].print_used_area(ref.input.size());
+                    population[i].calculate_used_area(ref.input.size());
+                    std::cout << "area: " << population[i].area << std::endl;
                 }
-                return;
+                return {population[i], gen};
             }
         }
 
@@ -52,6 +53,7 @@ void evolution(const Parameters &p, const ReferenceBits &ref) {
         }
     }
     std::cout << "NOT FOUND" << std::endl;
+    return {fittest, 0};
 }
 
 int main(int argc, char *argv[]) {
@@ -67,24 +69,11 @@ int main(int argc, char *argv[]) {
         ReferenceBits ref(p.path);
         p.is_valid(ref);
 
-        // srand(p.seed);
-        // std::cout << "seed: " << p.seed << std::endl;
-
-        // Circuit c(p, ref);
-        // c.print_circuit(ref.input.size(), p.print_ascii);
-        // c.calculate_fitness(p, ref);
-        // std::cout << "fitness: " << c.fitness << std::endl;
-        // std::cout << "================" << std::endl;
-        // c.mutate_overall(p, ref);
-        // c.print_circuit(ref.input.size(), p.print_ascii);
-        // c.calculate_fitness(p, ref);
-        // std::cout << "fitness: " << c.fitness << std::endl;
-        // c.mutate_overall(p, ref);
-        // std::cout << "================" << std::endl;
-        // c.print_circuit(ref.input.size(), false);
-
         auto start = std::chrono::steady_clock::now();
-        evolution(p, ref);
+        std::tuple<Circuit, uint> hold = evolution(p, ref);
+        if (std::get<1>(hold)) {
+
+        }
         auto end = std::chrono::steady_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
         std::cout << "time: " << elapsed_time.count() << std::endl;
