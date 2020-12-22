@@ -132,6 +132,7 @@ void Circuit::print_used_gates(const int inputs_count, const std::vector<Functio
 
 void Circuit::calculate_used_area(const int inputs_count, const std::vector<Function> &allowed) {
     this->inputs_count = inputs_count;
+
     find_used_gates();
     double area = 0;
     for (auto &fun : allowed) {
@@ -210,6 +211,7 @@ void Circuit::add_pass_gate(const int idx) {
 }
 
 void Circuit::find_used_gates() {
+    used_gates_indices.clear();
     for (auto &out : output_indices) {
         add_pass_gate(out);
     }

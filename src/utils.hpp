@@ -36,6 +36,17 @@ namespace utils {
         }
         return *best;
     }
+
+    template<class T>
+    inline T &get_fittest_invidiual_area(std::vector<T> &population) {
+        T *best = &population.at(0);
+        for (size_t i = 1; i < population.size(); i++) {
+            if (population[i].fitness <= best->fitness && population[i].area <= best->area) {
+                best = &population[i];
+            }
+        }
+        return *best;
+    }
 }
 
 #endif /* UTILS_H */

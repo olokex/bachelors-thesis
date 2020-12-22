@@ -189,6 +189,9 @@ int Formula::count_state(const int term, const int inputs_count, State s) {
 }
 
 void Formula::used_gates_count(const int inputs_count) {
+    gate_xor_count = 0;
+    gate_and_count = 0;
+    gate_not_count = 0;
     gate_xor_count = (literals.size() / inputs_count) - 1;
     for (size_t term = 0; term < (literals.size() / inputs_count); term++) {
         int not_count = count_state(term, inputs_count, State::Not);
