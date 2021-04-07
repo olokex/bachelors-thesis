@@ -5,12 +5,13 @@
 #include "cell.hpp"
 #include "function.hpp"
 #include <vector>
+#include <limits>
 
 
 class Circuit {
 public:
     unsigned int fitness = UINT_MAX;
-    double area = MAXFLOAT;
+    double area = std::numeric_limits<double>::max();
 
     Circuit(const Parameters &param, const ReferenceBits &reference_bits);
     void print_circuit_cgpviewer(const Parameters &param, const ReferenceBits &reference_bits);

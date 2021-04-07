@@ -1,6 +1,7 @@
 #ifndef CIRCUIT_H
 #define CIRCUIT_H
 #include <vector>
+#include <limits>
 #include "../reference_bits.hpp"
 #include "parameters.hpp"
 #include "formula.hpp"
@@ -8,7 +9,7 @@
 class Circuit {
 public:
     uint fitness = UINT_MAX;
-    double area = MAXFLOAT;
+    double area = std::numeric_limits<double>::max();
 
     Circuit(const Parameters &parameters, const ReferenceBits &reference_bits);
     void print_circuit(const int inputs_count, const bool print_ascii);
