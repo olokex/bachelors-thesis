@@ -52,7 +52,6 @@ void Formula::calculate_fitness(const ReferenceBits &reference_bits, const int i
     };
     
     if (shift == non_zeros.size()) {
-        // fitness = UINT16_MAX; // can cause overflow -> perfect fitness
         Bitset tmp(reference_bits.input[0].size(), 0);
         // tmp = tmp | reference_bits.output[idx_out]; // DNF
         tmp = tmp ^ reference_bits.output[idx_out];
@@ -88,12 +87,9 @@ void Formula::print_circuit(const int inputs_count) {
     std::cout << "\033[0m" << std::endl;
 }
 
-void Formula::print_circuit_ascii_only(const int inputs_count) {
+void Formula::print_circuit_ascii_only() {
     size_t cnt = 0;
-    //std::cout << "[";
     for (auto &x : literals) {
-        // size_t x_cnt = cnt % inputs_count;
-        //if (x_cnt == 0 && cnt != 0) std::cout << "] o [";
         if (x.state == State::Is) {
             std::cout << "1";
         } else if (x.state == State::Not) {
@@ -102,10 +98,8 @@ void Formula::print_circuit_ascii_only(const int inputs_count) {
             std::cout << "0";
         }
         if (cnt < literals.size() - 1) std::cout << ",";
-        //if (x_cnt != inputs_count - 1) std::cout << ",";
         cnt++;
     }
-    //std::cout << "]";
     std::cout << std::endl;
 }
 
@@ -160,10 +154,10 @@ void Formula::mutate(const Parameters &p, const ReferenceBits &reference_bits) {
     }
 
     else if (new_state == State::Not) {
-        if (non_zeros[idx_term].size() == p.arity) { // odstrani z nonzeros
+        if (non_zeros[idx_term].size() == p.arity) { // removed from non_zeros
             auto &vec = non_zeros[idx_term];
             auto it = std::find(vec.begin(), vec.end(), idx_literal);
-            if (it != vec.end()) { // vymazani pokud se nasel v non_zeros
+            if (it != vec.end()) { // erase if was found in non_zeros
                 vec.erase(it);
             } else {
                 int idx = utils::randint(0, vec.size());
@@ -179,31 +173,5 @@ void Formula::mutate(const Parameters &p, const ReferenceBits &reference_bits) {
         if (it == vec.end()) {
             vec.push_back(idx_literal);
         }
-    }
-}
-
-int Formula::count_state(const int term, const int inputs_count, State s) {
-    return std::count_if(literals.begin() + (term * inputs_count),
-                        literals.begin() + (term * inputs_count) + inputs_count,
-                        [&](Literal c){return c.state == s;});
-}
-
-void Formula::used_gates_count(const int inputs_count) {
-    gate_xor_count = 0;
-    gate_and_count = 0;
-    gate_not_count = 0;
-    gate_xor_count = (literals.size() / inputs_count) - 1;
-    for (size_t term = 0; term < (literals.size() / inputs_count); term++) {
-        int not_count = count_state(term, inputs_count, State::Not);
-        int is_count = count_state(term, inputs_count, State::Is);
-        
-        if ((is_count + not_count) > 1) {
-            gate_and_count += (is_count + not_count) - 1;
-        }
-        if (is_count == 0 && not_count == 0) {
-            gate_xor_count--;
-        }
-        gate_not_count += not_count;
-        //gates_unused += inputs_count - (not_count + is_count);
     }
 }

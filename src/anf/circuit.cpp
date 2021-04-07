@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <set>
 #include "parameters.hpp"
 #include "formula.hpp"
 #include "circuit.hpp"
@@ -21,47 +22,79 @@ void Circuit::mutate_overall(const Parameters &parameters, const ReferenceBits &
     }
 }
 
-void Circuit::print_used_gates(const int inputs_count) {
-    int gate_and_count = 0;
-    int gate_not_count = 0;
-    //int gates_unused = 0;
-    int gate_xor_count = 0;
-    for (auto &f : formulas) {
-        f.used_gates_count(inputs_count);
-        gate_and_count += f.gate_and_count;
-        gate_xor_count += f.gate_xor_count;
-        gate_not_count += f.gate_not_count;
-        //gates_unused += f.gates_unused;
+std::tuple<int, int, int> Circuit::used_gates_optimized(const int inputs_count) {
+    std::set<std::vector<int>> used_elements;
+    std::set<int> nots;
+    int xor_count = 0;
+    int and_count = 0;
+
+    for (auto &f: formulas) {
+        xor_count += f.non_zeros.size() - 1; // XORs in one formula
+        for (auto &nz : f.non_zeros) {
+            std::sort(nz.begin(), nz.end());
+            if (nz.size() == 0) xor_count--;
+            std::vector<int> pattern;
+            
+            for (auto &l : nz) {
+                int idx = l % inputs_count;
+                if (f.literals[l].state == State::Not) {
+                    nots.insert(idx);
+                }
+                pattern.emplace_back(idx);
+            }
+
+            if (used_elements.find(pattern) == used_elements.end() && pattern.size() > 1) {  
+                used_elements.insert(pattern);
+                and_count += pattern.size() - 1;
+            }
+        }
     }
-    int sum = gate_and_count + gate_not_count + gate_xor_count;
-    std::cout << "used gates: " << sum << std::endl;
-    //std::cout << "UNused gates: " << gates_unused << std::endl;
-    std::cout << "and: " << gate_and_count << std::endl;
-    std::cout << "xor: " << gate_xor_count << std::endl;
-    std::cout << "not: " << gate_not_count << std::endl;
+    return {xor_count, and_count, nots.size()};
 }
 
-void Circuit::calculate_used_area(const int inputs_count) {
-    int gate_and_count = 0;
-    int gate_not_count = 0;
-    int gate_xor_count = 0;
-    for (auto &f : formulas) {
-        f.used_gates_count(inputs_count);
-        gate_and_count += f.gate_and_count;
-        gate_xor_count += f.gate_xor_count;
-        gate_not_count += f.gate_not_count;
+std::tuple<int, int, int> Circuit::used_gates(const int inputs_count) {
+    std::set<int> nots;
+    int xor_count = 0;
+    int and_count = 0;
+
+    for (auto &f: formulas) {
+        xor_count += f.non_zeros.size() - 1; // XORs in one formula
+        for (auto &nz : f.non_zeros) {
+            if (nz.size() == 0) xor_count--;
+            
+            for (auto &l : nz) {
+                int idx = l % inputs_count;
+                if (f.literals[l].state == State::Not) {
+                    nots.insert(idx);
+                }
+            }
+            
+            if (nz.size() > 1) {
+                and_count += nz.size() - 1;
+            }
+        }
     }
-    double area = gate_and_count * gate_size::And
-                + gate_xor_count * gate_size::Xor
-                + gate_not_count * gate_size::Not;
-    // std::cout << "area: " << area << std::endl;
-    this->area = area;
+    return {xor_count, and_count, nots.size()};
+}
+
+void Circuit::print_used_gates(const int inputs_count, bool optimized) {
+    auto [xor_count, and_count, not_count] = (optimized ? used_gates_optimized(inputs_count) : used_gates(inputs_count));
+    int sum = and_count + not_count + xor_count;
+    std::cout << "used gates: " << sum << std::endl;
+    std::cout << "and: " << and_count << std::endl;
+    std::cout << "xor: " << xor_count << std::endl;
+    std::cout << "not: " << not_count << std::endl;
+}
+
+void Circuit::calculate_used_area(const int inputs_count, bool optimized) {
+    auto [xor_count, and_count, not_count] = (optimized ? used_gates_optimized(inputs_count) : used_gates(inputs_count));
+    area = and_count * gate_size::And + xor_count * gate_size::Xor + not_count * gate_size::Not;
 }
 
 void Circuit::print_circuit(const int inputs_count, const bool print_ascii) {
     for (size_t i = 0; i < formulas.size(); i++) {
         if (print_ascii) {
-            formulas[i].print_circuit_ascii_only(inputs_count);
+            formulas[i].print_circuit_ascii_only();
         } else {
             formulas[i].print_circuit(inputs_count);
         }
@@ -71,7 +104,6 @@ void Circuit::print_circuit(const int inputs_count, const bool print_ascii) {
 void Circuit::calculate_fitness(const ReferenceBits &reference_bits) {
     uint tmp_fit = 0;
     for (size_t i = 0; i < formulas.size(); i++) {
-        // formulas[i].calculate_fitness_new(reference_bits, i);
         formulas[i].calculate_fitness(reference_bits, i);
         tmp_fit += formulas[i].fitness;
     }

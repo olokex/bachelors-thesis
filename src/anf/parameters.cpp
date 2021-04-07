@@ -52,6 +52,11 @@ Parameters::Parameters(const int argc, const char * const argv[]) {
         //         throw std::runtime_error("Invalid value for crossover-random, expected true or false");
         //     }
         //     crossover = (val == "true");
+        } else if (opt == "second-criterion") {
+            if (val != "true" && val != "false") {
+                throw std::runtime_error("Invalid value for second-criterion, expected true or false");
+            }
+            second_criterion = (val == "true");
         } else if (opt == "print-used-gates") {
             if (val != "true" && val != "false") {
                 throw std::runtime_error("Invalid value for print-used-gates, expected true or false");

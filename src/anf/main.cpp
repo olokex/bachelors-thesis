@@ -10,15 +10,16 @@
 #include "../utils.hpp"
 
 
-std::tuple<Circuit, uint> evolution(const Parameters &p, const ReferenceBits &ref) {
+std::tuple<Circuit, uint, uint> evolution(const Parameters &p, const ReferenceBits &ref) {
     srand(p.seed);
     std::cout << "seed: " << p.seed << std::endl;
     std::vector<Circuit> population;
-
+    uint evaluation = 0;
     for (int i = 0; i < p.lambda + 1; i++) {
         Circuit c(p, ref);
         c.calculate_fitness(ref);
         population.push_back(c);
+        evaluation++;
     }
 
     Circuit fittest = utils::get_fittest_invidiual(population);
@@ -29,18 +30,20 @@ std::tuple<Circuit, uint> evolution(const Parameters &p, const ReferenceBits &re
             population[i] = fittest;
             population[i].mutate_overall(p, ref);
             population[i].calculate_fitness(ref);
+            evaluation++;
 
             if (population[i].fitness == 0) {
-                population[i].print_circuit(ref.input.size(), p.print_ascii);
-                std::cout << "generation: " << gen << std::endl;
+                // population[i].print_circuit(ref.input.size(), p.print_ascii);
+                std::cout << "evaluations: " << evaluation << std::endl;
+
                 if (p.print_used_gates) {
-                    population[i].print_used_gates(ref.input.size());
+                    population[i].print_used_gates(ref.input.size(), true);
                 }
                 if (p.print_used_area) {
-                    population[i].calculate_used_area(ref.input.size());
+                    population[i].calculate_used_area(ref.input.size(), true);
                     std::cout << "area: " << population[i].area << std::endl;
                 }
-                return {population[i], gen};
+                return {population[i], gen, evaluation};
             }
         }
 
@@ -50,18 +53,22 @@ std::tuple<Circuit, uint> evolution(const Parameters &p, const ReferenceBits &re
         }
 
         if (gen % p.print_count == 0 && p.print_fitness) {
-            std::cout << "generation: " << gen << " best fitness: " << fittest.fitness << std::endl;
+            std::cout << "evalutations: " << evaluation << " best fitness: " << fittest.fitness << std::endl;
         }
     }
 
     std::cout << "NOT FOUND" << std::endl;
-    return {fittest, 0};
+    return {fittest, 0, evaluation};
 }
 
-void evolution_second_criterio(const Parameters &p, const ReferenceBits &ref, std::tuple<Circuit, uint> holder) {
+void evolution_second_criterio(const Parameters &p, const ReferenceBits &ref, const std::tuple<Circuit, uint, uint> &holder) {
     std::vector<Circuit> population;
-    auto [fittest, generation_remain] = holder;
-    
+    auto [fittest, generation_remain, evaluation] = holder;
+    fittest.calculate_used_area(ref.input.size(), true);
+    std::cout << "first invidual area: " << fittest.area << std::endl;
+    // for better optimization the area is "oversized" (calculated again), would be a bit unfair in next search
+    fittest.calculate_used_area(ref.input.size()); 
+
     for (int i = 0; i < p.lambda; i++) {
         population.push_back(fittest);
     }
@@ -73,6 +80,7 @@ void evolution_second_criterio(const Parameters &p, const ReferenceBits &ref, st
             population[i].mutate_overall(p, ref);
             population[i].calculate_used_area(ref.input.size());
             population[i].calculate_fitness(ref);
+            evaluation++;
         }
 
         Circuit &new_fittest = utils::get_fittest_invidiual_area(population);
@@ -81,11 +89,16 @@ void evolution_second_criterio(const Parameters &p, const ReferenceBits &ref, st
         }
 
         if (gen % p.print_count == 0 && p.print_fitness) {
-            std::cout << "generation: " << gen << " area: " << fittest.area << std::endl;
+            std::cout << "evalutions: " << evaluation << " area: " << fittest.area << std::endl;
         }
     }
 
-    fittest.print_circuit(ref.input.size(), p.print_ascii);
+    if (p.print_used_gates) {
+        fittest.print_used_gates(ref.input.size(), true);
+    }
+    
+    // fittest.print_circuit(ref.input.size(), p.print_ascii);
+    fittest.calculate_used_area(ref.input.size(), true);
     std::cout << "optimized area: " << fittest.area << std::endl; 
 }
 
@@ -102,14 +115,25 @@ int main(int argc, char *argv[]) {
         ReferenceBits ref(p.path);
         p.is_valid(ref);
 
-        auto start = std::chrono::steady_clock::now();
-        std::tuple<Circuit, uint> hold = evolution(p, ref);
-        if (std::get<1>(hold)) {
+        // auto start = std::chrono::steady_clock::now();
+        // Circuit c(p, ref);
+        // for (int i = 0; i < 5; i++) {
+        //     c.mutate_overall(p, ref);
+        //     c.calculate_fitness(ref);
+        //     c.calculate_used_area(ref.input.size());
+        //     c.print_used_gates(ref.input.size(), true);
+        //     std::cout << "area: " << c.area << std::endl;
+        //     c.print_circuit(ref.input.size(), false);
+        // }
+
+        std::tuple<Circuit, uint, uint> hold = evolution(p, ref);
+        if (std::get<1>(hold) && p.second_criterion) {
             evolution_second_criterio(p, ref, hold);
         }
-        auto end = std::chrono::steady_clock::now();
-        auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        std::cout << "time: " << elapsed_time.count() << " ms" << std::endl;
+
+        // auto end = std::chrono::steady_clock::now();
+        // auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        // std::cout << "time: " << elapsed_time.count() << " ms" << std::endl;
     } catch (const std::runtime_error &err) {
         std::cerr << "ERROR: " << err.what() << std::endl;
         return 1;

@@ -1,5 +1,5 @@
 build/
 .vscode/
-old_*/
-outputs_*/
+old*/
+outputs*/
 test*

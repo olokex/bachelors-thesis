@@ -37,6 +37,7 @@ print-count     | >= 1 (have to be used with print-fitness)
 print-fitness   | true/false
 print-used-gates| true/false
 print-used-area | true/false
+second-criterion| true/false
 
 **CGP only**
 option                | expected value

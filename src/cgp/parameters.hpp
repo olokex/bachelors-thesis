@@ -29,6 +29,7 @@ public:
     bool print_fitness = false;
     bool print_used_gates = false;
     bool print_used_area = false;
+    bool second_criterion = false;
     int print_count = 100'000;
 
     Parameters();
