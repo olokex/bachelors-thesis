@@ -1,3 +1,14 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *      Main file for CGP method. Evolution second criterion as well, the core of program is done here.
+ *      Method uses evolutionary strategy known as lambda + 1.
+ *      Two-step multi-criteria model is used for the chip's area.
+ * 
+ */
+
 #include <iostream>
 #include <chrono>
 #include <tuple>

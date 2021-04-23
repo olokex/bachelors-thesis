@@ -1,3 +1,13 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *      Class for parametrs, which store default parameters for evo run.
+ *      All parameters can be modified within program parameters.
+ * 
+ */
+
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 #include <vector>

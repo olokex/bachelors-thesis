@@ -1,3 +1,12 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *     Main logic for circuit in CGP. More below
+ * 
+ */
+
 #include <iostream>
 #include <cstdio>
 #include "parameters.hpp"
@@ -7,6 +16,12 @@
 #include "../reference_bits.hpp"
 #include "../process_size.hpp"
 
+
+/**
+ * Circuit is built with L-back interconnection boundaries.
+ * Inputs are understand as the "IN" gates (wire).
+ * Outputs indices are stored in vector.
+ */
 Circuit::Circuit(const Parameters &param, const ReferenceBits &reference_bits) {
     push_inputs(reference_bits);
     auto random_input = [&](int start_cells_size, int col) {
@@ -31,6 +46,11 @@ Circuit::Circuit(const Parameters &param, const ReferenceBits &reference_bits) {
     }
 }
 
+
+/**
+ * Method prints chromozom of CGP in cgpviewer notation.
+ * Two input and one input for one gate (hardcoded).
+ */
 void Circuit::print_circuit_cgpviewer(const Parameters &param, const ReferenceBits &reference_bits) {
     printf("{%ld,%ld,%d,%d,2,1,%ld}",
         reference_bits.input.size(),
@@ -54,6 +74,11 @@ void Circuit::print_circuit_cgpviewer(const Parameters &param, const ReferenceBi
     std::cout << ")" << std::endl;
 }
 
+
+/**
+ * Bits are evaluated from the first gate to the last gate unconditionally.
+ * This can be bottleneck for large circuits due a lot of evaluations has to be done for a big grid.
+ */
 void Circuit::evaluate(const int input_size) {
     for (auto it = cells.begin() + input_size; it != cells.end(); it++) {
         Bitset &in1 = cells[it->input1].output;
@@ -72,6 +97,11 @@ void Circuit::evaluate(const int input_size) {
     }
 }
 
+
+/**
+ * For accelerating the process is used xor (AVX 256/512 bits within one tick - two equal vectors going to be nulled).
+ * Fitness equal to 0 is a fully functional circuit.
+ */
 void Circuit::calculate_fitness(const ReferenceBits &reference_bits) {
     fitness = 0;
     for (unsigned int i = 0; i < output_indices.size(); i++) {
@@ -79,6 +109,20 @@ void Circuit::calculate_fitness(const ReferenceBits &reference_bits) {
     }
 }
 
+/**
+ * Mutation rate is calculated in advance after parsing parameters.
+ * Mutation rate can be calculated as:
+ *      100 gates each gate hold 2 inputs and 1 function => 300 values to mutate
+ *      for 1 % mutation is 300/100 = 3 alelas altered.
+ * 
+ * Outpus vector is in count too. Probability is uniform.
+ * 
+ * Possible changes:
+ *      Input1 is changed
+ *      Input2 is changed
+ *      Function is changed
+ *      Output X index is changed
+ */
 void Circuit::mutate(const int mutation_rate, const std::vector<Function> &allowed_functions, const int inputs_count) {
     int cells_size = cells.size();
 
@@ -104,6 +148,10 @@ void Circuit::mutate(const int mutation_rate, const std::vector<Function> &allow
     }
 }
 
+/**
+ * Prints out input's index and bitset
+ * This method has only debugging purpose. 
+ */
 void Circuit::print_bits(const ReferenceBits &reference_bits) {
     for (unsigned int i = 0; i < reference_bits.input.size(); i++) {
         std::cout << "input " << i << ": " << reference_bits.input[i] << std::endl;
@@ -113,6 +161,10 @@ void Circuit::print_bits(const ReferenceBits &reference_bits) {
     }
 }
 
+
+/**
+ * This method provides prints used gates. Also the delta of a circuit is provided.
+ */
 void Circuit::print_used_gates(const int inputs_count, const std::vector<Function> &allowed) {
     this->inputs_count = inputs_count;
     find_used_gates();
@@ -130,6 +182,9 @@ void Circuit::print_used_gates(const int inputs_count, const std::vector<Functio
     }
 }
 
+/**
+ * Calculates the chip's area in 45 nm process. The sum of logical elements count multiplied by coeficient.
+ */
 void Circuit::calculate_used_area(const int inputs_count, const std::vector<Function> &allowed) {
     this->inputs_count = inputs_count;
 
@@ -167,6 +222,10 @@ void Circuit::calculate_used_area(const int inputs_count, const std::vector<Func
     this->area = area;
 }
 
+
+/**
+ * Inserts inputs as "wire gates" on the front gate vector.
+ */
 void Circuit::push_inputs(const ReferenceBits &reference_bits) {
     for (auto input : reference_bits.input) {
         Cell c;
@@ -176,6 +235,9 @@ void Circuit::push_inputs(const ReferenceBits &reference_bits) {
     }
 }
 
+/**
+ * Counts certain logical function in active gate's vector.
+ */
 int Circuit::count_gates_within_function(const Function fun) {
     int cnt = 0;
     for (auto &idx : used_gates_indices) {
@@ -185,6 +247,11 @@ int Circuit::count_gates_within_function(const Function fun) {
     return cnt;
 }
 
+/**
+ * Checks if the gate is redundant.
+ * Redundancy is if input1 and input2 are connected to the same input.
+ * This fact 1 and 1 => 1 (nothing has changed) same goes for or.
+ */
 bool Circuit::redundant_gate(const int idx) {
     if (cells[idx].input1 == cells[idx].input2) {
         Function fun = cells[idx].function;
@@ -195,6 +262,10 @@ bool Circuit::redundant_gate(const int idx) {
     return false;
 }
 
+
+/**
+ * Inserts active gates into vector. Also redundancy is avoided (don't want to count same gate twice or more times).
+ */
 void Circuit::add_pass_gate(const int idx) {
     if (idx < inputs_count) return;
     if (!utils::is_in_vector(used_gates_indices, idx)) {
@@ -210,6 +281,10 @@ void Circuit::add_pass_gate(const int idx) {
     }
 }
 
+
+/**
+ * Tracing active elements in the circuit (gates).
+ */
 void Circuit::find_used_gates() {
     used_gates_indices.clear();
     for (auto &out : output_indices) {
@@ -217,6 +292,10 @@ void Circuit::find_used_gates() {
     }
 }
 
+
+/**
+ * Depth (width) of output is traced.
+ */ 
 int Circuit::depth(const int idx) {
     if (idx < inputs_count) return 0;
 
@@ -242,6 +321,10 @@ int Circuit::depth(const int idx) {
     }
 }
 
+
+/**
+ * The longest (slowest) path is delay of the circuit.
+ */
 void Circuit::find_max_delay() {
     int max_delta = 0;
     for (auto &out : output_indices) {

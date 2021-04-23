@@ -1,3 +1,12 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *     Header's file for CGP circuit.
+ * 
+ */
+
 #ifndef CIRCUIT_H
 #define CIRCUIT_H
 #include "../reference_bits.hpp"
@@ -10,7 +19,7 @@
 
 class Circuit {
 public:
-    unsigned int fitness = UINT_MAX;
+    unsigned int fitness = std::numeric_limits<uint>::max();
     double area = std::numeric_limits<double>::max();
 
     Circuit(const Parameters &param, const ReferenceBits &reference_bits);

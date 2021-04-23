@@ -1,3 +1,12 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *      Header's file for bitsets.
+ * 
+ */
+
 #ifndef REFERENCE_BITS_H
 #define REFERENCE_BITS_H
 #include <boost/dynamic_bitset.hpp>

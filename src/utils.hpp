@@ -1,3 +1,14 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *      Header's file for utitility namespace.
+ *      Some useful functions as check for duplicity, if vector contains an element, 
+ *      function providing parent within better fitness/chip's area.
+ * 
+ */
+
 #ifndef UTILS_H
 #define UTILS_H
 #include <string>

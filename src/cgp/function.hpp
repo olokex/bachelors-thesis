@@ -1,3 +1,12 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *     Enum of logical functions. Also function to string function (used for gates count).
+ * 
+ */
+
 #ifndef FUNCTION_H
 #define FUNCTION_H
 #include <string>

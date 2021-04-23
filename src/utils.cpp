@@ -1,3 +1,14 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *      Useful functions can be found in utitility namespace, such as cast u/int.
+ *      Split function (same as in python).
+ *      Randint function (same as in python with excluded upper limit).
+ * 
+ */
+
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <iostream>

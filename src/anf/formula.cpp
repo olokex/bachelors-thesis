@@ -1,3 +1,12 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *      Every formula (line in equation) is processed here. Read futher comments at each method.
+ * 
+ */
+
 #include "../reference_bits.hpp"
 #include "parameters.hpp"
 #include "literal.hpp"
@@ -6,6 +15,17 @@
 #include <vector>
 #include <iostream>
 
+
+/**
+ * Formula is constructed with certain restrictions. 
+ * One of the restriction is how many active inputs can be in one term (arity).
+ * 
+ * Every formula is vector of literals. 
+ * The state is randomly initialized.
+ * If active elements limit is reached then every literal is as non-active (bitwise value is stored anyways).
+ * 
+ * Non-zeros vector hold indices of active elements (latter very useful for fitness and circuit's area).
+ */
 Formula::Formula(const int term_count, const unsigned int arity, const ReferenceBits &reference_bits) {
     non_zeros.resize(term_count);
     int cnt = 0;
@@ -34,6 +54,12 @@ Formula::Formula(const int term_count, const unsigned int arity, const Reference
     }
 }
 
+
+/**
+ * Fitness is overall score of matched reference bits.
+ * Evaluation is done in a way from left to right - first left term, then second left term etc.
+ * In the same way evaluation is done for ANDs. This is done in the same way as two-level gate evaluation.
+ */
 void Formula::calculate_fitness(const ReferenceBits &reference_bits, const int idx_out) {
     size_t shift = 0;
     for (size_t i = 0; i < non_zeros.size(); i++) {
@@ -69,6 +95,10 @@ void Formula::calculate_fitness(const ReferenceBits &reference_bits, const int i
     fitness = out.count();
 }
 
+/**
+ * Prints out every formula in specific style (easy for visual debugging).
+ * Command line with ANSI escape codes - it can cause some troubles, hence ascii-only method.
+ */
 void Formula::print_circuit(const int inputs_count) {
     int cnt = 0;
     for (auto &x : literals) {
@@ -87,6 +117,13 @@ void Formula::print_circuit(const int inputs_count) {
     std::cout << "\033[0m" << std::endl;
 }
 
+/**
+ * Prints out every formula in ANSI free style, delimited with comma.
+ * Optional switch `print-ascii true`.
+ * 1 is active element.
+ * -1 is negated.
+ * 0 is unused.
+ */
 void Formula::print_circuit_ascii_only() {
     size_t cnt = 0;
     for (auto &x : literals) {
@@ -103,6 +140,10 @@ void Formula::print_circuit_ascii_only() {
     std::cout << std::endl;
 }
 
+/**
+ * Redundant method which prints each literal with index, bit value, and function (in/active).
+ * Usage is debugging purpose.
+ */
 void Formula::print_bits(const int term_count, const int inputs_count) {
     for (int term = 0; term < term_count; term++) {
         for (int i = 0; i < inputs_count; i++) {
@@ -115,27 +156,35 @@ void Formula::print_bits(const int term_count, const int inputs_count) {
     }
 }
 
+/**
+ * Mutation is done by random chosen input being legally modified.
+ * 
+ * Arity sets rough boundaries. Whether arity in one term is already full, thus one literal (its index) has to be deactivated, and
+ * another one going to be activated (a small note - mutation can be negative, neutral, or positive).
+ * 
+ * Always one mutation one call. If you want to mutate 5 times you have to call this method 5 times.
+ */
 void Formula::mutate(const Parameters &p, const ReferenceBits &reference_bits) {
-    int idx_literal = utils::randint(0, literals.size());     // vygenerování IDX literalu co se má změnit
-    int idx_term = idx_literal / reference_bits.input.size(); // zjištění pozice termu
-    State new_state = State(utils::randint(0, 3)); // vygenerování nového stavu
+    int idx_literal = utils::randint(0, literals.size());     // index of literal that is going to be changed
+    int idx_term = idx_literal / reference_bits.input.size(); // position detection of term
+    State new_state = State(utils::randint(0, 3)); // new state is generated
 
     if (new_state == State::IsNot) {
         auto &vec = non_zeros[idx_term];
         auto it = std::find(vec.begin(), vec.end(), idx_literal);
-        if (it != vec.end()) { // vymazani pokud se nasel v non_zeros
+        if (it != vec.end()) { // erase if was found in non_zeros
             vec.erase(it);
         }
-        int idx_input = idx_literal % reference_bits.input.size(); // teoreticky nadbytecne
+        int idx_input = idx_literal % reference_bits.input.size();
         literals[idx_literal].value = reference_bits.input[idx_input];
         literals[idx_literal].state = new_state;
     }
 
     else if (new_state == State::Is) {
-        if (non_zeros[idx_term].size() == p.arity) { // odstrani z nonzeros
+        if (non_zeros[idx_term].size() == p.arity) { // removed from nonzeros
             auto &vec = non_zeros[idx_term];
             auto it = std::find(vec.begin(), vec.end(), idx_literal);
-            if (it != vec.end()) { // vymazani pokud se nasel v non_zeros
+            if (it != vec.end()) { // erase if was found in non_zeros
                 vec.erase(it);
             } else {
                 int idx = utils::randint(0, vec.size());

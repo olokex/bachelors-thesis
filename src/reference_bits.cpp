@@ -1,3 +1,12 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *      Parsing inputs truth table to obtain reference bitset.
+ * 
+ */
+
 #include "reference_bits.hpp"
 #include <boost/dynamic_bitset.hpp>
 #include <vector>
@@ -7,6 +16,17 @@
 #include <exception>
 #include <stdexcept>
 
+
+/**
+ * Parses input file to obtain bitset vector. Supported format is PLA standard.
+ * .header
+ * Xn inputs space Yn outputs
+ * 
+ * 1 logical true
+ * 0 logical false
+ * - input's don't care
+ * ~ output's don't care
+ */
 ReferenceBits::ReferenceBits(const std::string &path) {
     std::ifstream fp;
     std::string line;
@@ -50,6 +70,9 @@ ReferenceBits::ReferenceBits(const std::string &path) {
     }
 }
 
+/**
+ * Method removes needless inputs as a header of PLA.
+ */
 std::vector<std::string> ReferenceBits::remove_unnecessary(std::ifstream &fp) {
     std::string line;
     std::vector<std::string> clean_file;

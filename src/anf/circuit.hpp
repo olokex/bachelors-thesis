@@ -1,3 +1,12 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *      Header file for ANF circuit class.
+ * 
+ */
+
 #ifndef CIRCUIT_H
 #define CIRCUIT_H
 #include <vector>
@@ -8,7 +17,7 @@
 
 class Circuit {
 public:
-    uint fitness = UINT_MAX;
+    uint fitness = std::numeric_limits<uint>::max();
     double area = std::numeric_limits<double>::max();
 
     Circuit(const Parameters &parameters, const ReferenceBits &reference_bits);

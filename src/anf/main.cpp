@@ -1,3 +1,14 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *      Main file for ANF method. Evolution second criterion as well, the core of program is done here.
+ *      Method uses evolutionary strategy known as lambda + 1.
+ *      Two-step multi-criteria model is used for the chip's area.
+ * 
+ */
+
 #include <iostream>
 #include <chrono>
 #include <tuple>
@@ -116,16 +127,6 @@ int main(int argc, char *argv[]) {
         p.is_valid(ref);
 
         // auto start = std::chrono::steady_clock::now();
-        // Circuit c(p, ref);
-        // for (int i = 0; i < 5; i++) {
-        //     c.mutate_overall(p, ref);
-        //     c.calculate_fitness(ref);
-        //     c.calculate_used_area(ref.input.size());
-        //     c.print_used_gates(ref.input.size(), true);
-        //     std::cout << "area: " << c.area << std::endl;
-        //     c.print_circuit(ref.input.size(), false);
-        // }
-
         std::tuple<Circuit, uint, uint> hold = evolution(p, ref);
         if (std::get<1>(hold) && p.second_criterion) {
             evolution_second_criterio(p, ref, hold);

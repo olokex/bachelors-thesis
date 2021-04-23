@@ -1,3 +1,12 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *      Parsing program's parameters. Futher info "how to use" in README.md can be found (boundaries).
+ * 
+ */
+
 #include "../utils.hpp"
 #include "parameters.hpp"
 #include <iostream>
@@ -79,7 +88,21 @@ Parameters::Parameters(const int argc, const char * const argv[]) {
 }
 
 void Parameters::print_help() {
-    std::cout << "anf help" << std::endl; // TODO
+    std::cout << "Usage for ANF:" << std::endl;
+    std::cout << "In case of parameter duplicity, the last value is used. The order of the parameters doesn't matter." << std::endl;
+    std::cout << "All parameters are optional except `path` this one is required." << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "lambda 1+" << std::endl;
+    std::cout << "path path to truth table" << std::endl;
+    std::cout << "mutate 1+" << std::endl;
+    std::cout << "generations 1+" << std::endl;
+    std::cout << "seed 0+" << std::endl;
+    std::cout << "print-count 1+ (have to be used with print-fitness)" << std::endl;
+    std::cout << "print-fitness	true/false" << std::endl;
+    std::cout << "print-used-gates true/false" << std::endl;
+    std::cout << "print-used-area true/false" << std::endl;
+    std::cout << "second-criterion true/false" << std::endl;
 };
 
 void Parameters::is_valid(const ReferenceBits &reference_bits) {

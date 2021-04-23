@@ -1,3 +1,12 @@
+/**
+ * Subject: Bachelor's thesis
+ * Author: Adam Sedlacek | xsedla1e@vutbr.cz
+ * Year: 2021
+ * Description:
+ *      Parsing program's parameters. Futher info "how to use" in README.md can be found (boundaries)
+ * 
+ */
+
 #include <string>
 #include <iostream>
 #include <ctime>
